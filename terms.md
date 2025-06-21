@@ -1,6 +1,6 @@
 # Terms & Conditions
 
-_Last updated: May 7, 2025_
+_Last updated: June 21, 2025_
 
 Welcome to **MyToDoo**, a simple and customizable to-do list app. These Terms & Conditions ("Terms") govern your use of the app. By using MyToDoo, you agree to be bound by these Terms.
 
@@ -8,18 +8,20 @@ Welcome to **MyToDoo**, a simple and customizable to-do list app. These Terms & 
 
 MyToDoo is provided for personal, non-commercial use. You may use the app to create and manage task lists on your own device. All data is stored locally; we do not collect, store, or share any personal information.
 
-## 2. Ads and Premium Upgrade
+## 2. Premium Upgrade
 
-- **Free Version**: Displays minimal, non-intrusive ads. We have configured the app to request **non-personalized ads** to minimize data collection by ad providers.
-- **Premium Version**: A one-time purchase unlocks the following features:
-  - Removal of all ads
-  - Unlimited lists and tasks
-  - Full access to all color customization options
-  - Additional preset themes
+The free version of MyToDoo allows up to **5 task lists**, with a maximum of **50 items per list**.
+
+A one-time Premium upgrade unlocks the following features:
+- Unlimited lists and tasks
+- Full access to all color customization options
+- Additional preset themes
+
+Purchasing the Premium upgrade is a **one-time, non-refundable payment** processed through the app store (currently €2.99 or local equivalent). By upgrading, you acknowledge that the purchase is final.
 
 ## 3. Payments
 
-Purchasing the Premium upgrade is a **one-time, non-refundable payment** processed through the app store. By upgrading, you acknowledge that the purchase is final.
+Purchasing the Premium upgrade is processed through the app store. Refunds are subject to the app store's policies.
 
 ## 4. Intellectual Property
 
@@ -38,6 +40,3 @@ We may update these Terms occasionally. When we do, the updated version will be 
 If you have questions or concerns, feel free to contact us at:
 
 **greenantapps@gmail.com**
-
----
-
