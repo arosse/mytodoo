@@ -1,6 +1,6 @@
 # Privacy Policy
 
-_Last updated: July 9, 2025_
+_Last updated: January 1, 2026_
 
 **Formula10** is developed by **GreenAnt Apps**.
 
@@ -12,7 +12,7 @@ Your privacy is important to us. This Privacy Policy explains how we handle any 
 
 ## 2. Ads and Analytics
 
-Formula10 contains **no advertisements** and does **not use any third-party analytics or tracking services**.
+Formula10 contains **no advertisements**. The app collects **fully anonymized gameplay statistics** to help us improve game balance, track feature usage, and enhance overall gameplay experience. This data is **completely anonymous and does not include personal information**.
 
 ## 3. In-App Purchases
 
