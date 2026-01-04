@@ -12,7 +12,7 @@ Your privacy is important to us. This Privacy Policy explains how we handle any 
 
 ## 2. Ads and Analytics
 
-Formula10 contains **no advertisements**. The app collects **fully anonymized gameplay statistics** to help us improve game balance, track feature usage, and enhance overall gameplay experience. This data is **completely anonymous and does not include personal information**.
+Formula10 contains **no advertisements**. The app collects **fully anonymized gameplay statistics, basic device information, and approximate location** to help us improve game balance, track feature usage, and enhance overall gameplay experience. This data is **completely anonymous and does not include personal information**.
 
 ## 3. In-App Purchases
 
