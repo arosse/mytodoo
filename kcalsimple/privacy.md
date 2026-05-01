@@ -2,7 +2,7 @@
 
 # Privacy Policy
 
-*Last updated: April 27, 2026*
+*Last updated: May 1st, 2026*
 
 **KcalSimple** is developed by **GreenAnt Apps**.
 
@@ -14,7 +14,12 @@ Your privacy is important to us. This Privacy Policy explains how we handle any 
 
 ## 2. Third-Party Services
 
-KcalSimple uses the **OpenFoodFacts API** to search for food products by name or barcode. When you perform a search or scan a barcode, the search query or barcode number is sent to the OpenFoodFacts servers to retrieve nutritional information. No personal data is included in these requests. OpenFoodFacts is a free and open food database — you can read their privacy policy at [world.openfoodfacts.org](https://world.openfoodfacts.org).
+KcalSimple uses two external services to search for food products:
+
+- **Open Food Facts API** — when you search by name or scan a barcode, the query or barcode is sent to Open Food Facts servers. No personal data is included. Learn more at [world.openfoodfacts.org](https://world.openfoodfacts.org).
+- **USDA FoodData Central API** — when you search by name, the query is also sent to the USDA FoodData Central servers to retrieve nutritional data for generic foods. No personal data is included. Learn more at [fdc.nal.usda.gov](https://fdc.nal.usda.gov).
+
+Both services are free and publicly available. Neither receives any personal information from KcalSimple.
 
 ## 3. Ads and Analytics
 

@@ -1,6 +1,6 @@
 # Terms & Conditions
 
-*Last updated: April 27, 2026*
+*Last updated: May 1st, 2026*
 
 Welcome to **KcalSimple**, a calorie tracking app developed by **GreenAnt Apps**. These Terms & Conditions ("Terms") govern your use of the app. By using KcalSimple, you agree to be bound by these Terms.
 
@@ -22,7 +22,12 @@ All content in KcalSimple, including the app design, graphics, and branding, is 
 
 ## 5. Third-Party Services
 
-KcalSimple uses the **OpenFoodFacts API** to retrieve nutritional information for food products. This service is provided by a third party and is subject to their own terms of use. GreenAnt Apps is not responsible for the accuracy or availability of data provided by OpenFoodFacts.
+KcalSimple uses two third-party services to retrieve nutritional information:
+
+- **Open Food Facts** — a free, open food product database. Subject to their own terms at [world.openfoodfacts.org](https://world.openfoodfacts.org).
+- **USDA FoodData Central** — a public nutritional database maintained by the U.S. Department of Agriculture. Data is in the public domain (CC0 1.0). Learn more at [fdc.nal.usda.gov](https://fdc.nal.usda.gov).
+
+GreenAnt Apps is not responsible for the accuracy or availability of data provided by either service.
 
 ## 6. Disclaimer
 
