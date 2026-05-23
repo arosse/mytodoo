@@ -21,7 +21,7 @@ Both actions are mandatory. Failing either one will break the mutual testing cyc
 - Missing Action 1 → you cannot install other testers' apps
 - Missing Action 2 → other testers cannot install your app
 
-**Note on accounts:** You may sign in to TestCircle with any Google account. However, Action 1 must be performed using the Google account linked to your Android test device — this may be a different account to the one you use to sign in to TestCircle.
+**Note on accounts:** You may sign in to TestCircle with any Google account. However, Action 1 must be performed using the Google account linked to your Android test device — this may be a different account to the one you use to sign in to TestCircle. Using the wrong account for Action 1 will prevent you from installing other testers' apps, but will not affect other testers' ability to install your app.
 
 ## 3. How the Platform Works
 
@@ -40,7 +40,7 @@ By submitting your app to TestCircle, you confirm that:
 - The app is available in all countries (testers may be from any region)
 - The app does not contain illegal, harmful, or inappropriate content
 - Any test credentials you provide are valid and allow access to the app's core features
-- The same app may not appear more than once in the same testing group
+- The same app (identified by its package name) may not appear more than once in the same testing group, regardless of how many accounts are used to submit it. Attempting to circumvent this rule by creating multiple accounts will result in removal of duplicate submissions and suspension of all associated accounts.
 
 GreenAnt Apps reserves the right to remove any app from the platform that violates these requirements.
 
