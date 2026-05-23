@@ -1,5 +1,3 @@
-# Privacy Policy | GreenAnt Apps
-
 # Privacy Policy
 *Last updated: May 2026*
 
