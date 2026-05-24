@@ -76,6 +76,8 @@ All content in TestCircle, including the app design, graphics, and branding, is 
 
 User-submitted content (feedback, screenshots) remains your property. By submitting it, you grant GreenAnt Apps a limited licence to store and display it within the platform for the purposes of operating the service.
 
+Detailed phase feedback is automatically deleted 30 days after a testing cycle completes. Screenshots are automatically deleted after 30 days. AI-generated summaries are retained for as long as your account remains active.
+
 ## 10. Disclaimer
 
 TestCircle is provided "as is" without warranties of any kind. While we aim to provide a reliable and fair platform, GreenAnt Apps is not responsible for:

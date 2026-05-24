@@ -16,13 +16,15 @@ To provide the TestCircle service, we collect the following information:
 - Your Google display name
 - Your Google profile photo URL
 
+This information is used solely for authentication and account management. It is never shared with other testers on the platform.
+
 **App submission details:**
 - App name, package name, and Play Store URL
 - App icon
 - Optional test account credentials (username, password, additional notes) — used solely to allow testers to access your app
 
 **Testing activity:**
-- Phase feedback forms (your written responses to testing prompts)
+- Phase feedback forms (your written responses to testing prompts — automatically deleted 30 days after testing cycle completion)
 - Screenshots uploaded as proof of install or to illustrate bugs (automatically deleted after 30 days)
 - Timestamps of key actions (installs, submissions, logins)
 
@@ -55,6 +57,7 @@ TestCircle uses the following third-party services:
 ## 4. Data Retention
 
 - **Screenshots** are automatically deleted after 30 days.
+- **Detailed phase feedback** (written tester responses) is automatically deleted 30 days after the testing cycle completes. AI-generated summaries are retained for as long as your account is active.
 - **Account data** is retained for as long as your account is active.
 - **On account deletion**, all your personal data, app submissions, and testing history are permanently deleted from our systems. Screenshots shared with your testing group are handled by the 30-day auto-cleanup cycle.
 
