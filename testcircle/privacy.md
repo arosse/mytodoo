@@ -61,30 +61,50 @@ TestCircle uses the following third-party services:
 - **Account data** is retained for as long as your account is active.
 - **On account deletion**, all your personal data, app submissions, and testing history are permanently deleted from our systems. Screenshots shared with your testing group are handled by the 30-day auto-cleanup cycle.
 
-## 5. Your Rights (GDPR)
+## 5. Account Deletion {#account-deletion}
+
+You can delete your account and all associated data at any time, directly from within the app:
+
+1. Open TestCircle and sign in with the account you with to delete
+2. Tap the menu icon (top right)
+3. Tap **Delete Account**
+4. Confirm — your account and all associated data will be permanently and immediately deleted
+
+**What is deleted:**
+- Your account (Google Sign-In credentials unlinked)
+- Your app submissions and testing history
+- Your notification history
+
+**What is not immediately deleted:**
+- Screenshots you uploaded are subject to the 30-day auto-cleanup cycle described in Section 4
+- Feedback you wrote for other developers' apps is retained so they can access the testing results they received. This feedback is identified by app name only and is automatically deleted 30 days after the testing cycle completes.
+
+If you are unable to access the app, you may also request account deletion by contacting us at **greenantapps@gmail.com** with the subject line "Account Deletion Request". We will process your request within 30 days.
+
+## 6. Your Rights (GDPR)
 
 If you are located in the European Economic Area, you have the following rights:
 - **Access** — request a copy of the data we hold about you
 - **Rectification** — request correction of inaccurate data
-- **Erasure** — delete your account and all associated data from within the app (Settings → Delete Account)
+- **Erasure** — [delete your account](#account-deletion) and all associated data from within the app, or contact us
 - **Portability** — request your data in a portable format
 - **Objection** — object to processing of your data
 
 To exercise any of these rights, contact us at **greenantapps@gmail.com**.
 
-## 6. Data Security
+## 7. Data Security
 
 All data is stored in Google Firebase infrastructure with industry-standard security. Access to your data is restricted by Firestore security rules — testers can only access data relevant to their active testing group. Test credentials you provide are only visible to developers who have confirmed a mutual install with you.
 
-## 7. Children's Privacy
+## 8. Children's Privacy
 
 TestCircle is intended for adult developers and is not directed at children under 13. We do not knowingly collect data from children under 13.
 
-## 8. Changes to This Privacy Policy
+## 9. Changes to This Privacy Policy
 
 We may update this Privacy Policy from time to time. When we do, the updated version will be published at this URL and the version date will be updated. Continued use of the app after changes constitutes acceptance of the updated policy.
 
-## 9. Contact Us
+## 10. Contact Us
 
 If you have any questions or concerns about this Privacy Policy, please contact us at:
 
