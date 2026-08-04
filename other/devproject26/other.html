@@ -248,7 +248,6 @@
       </nav>
       <div class="sidebar-footer">
         <div id="userInfo" style="margin-bottom:4px;"></div>
-        <div id="lastRefresh" class="refresh-indicator">—</div>
         <button class="signout-btn" onclick="signOut()">Sign out</button>
         <button class="signout-btn" style="margin-top:4px;" onclick="exportDebugData()">⬇ Export debug JSON</button>
       </div>
@@ -282,7 +281,7 @@
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getFirestore, collection, getDocs, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getFirestore, collection, getDocs, query, orderBy, where, getCountFromServer } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as fbSignOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 const firebaseConfig = {
@@ -330,21 +329,102 @@ window._state = {
   groups: [], apps: {}, users: {}, installations: [],
   submissions: [], summaries: [], flags: [],
   singleTestApps: [], singleTestSubmissions: [],
-  messages: [],
+  messages: [], installationsByGroup: {}, submissionsByGroup: {}, messagesByGroup: {},
   currentView: 'overview', groupFilter: 'all', currentGroupId: null,
   expandedSingleTestApps: new Set(),
   expandedOldGroups: new Set(),
   loaded: {
     groups: false, apps: false, users: false, installations: false,
     submissions: false, summaries: false, flags: false,
-    singleTestApps: false, singleTestSubmissions: false,
-    messages: false
-  }
+    singleTestApps: false, singleTestSubmissions: false
+  },
+  // When each dataset was last actually fetched from Firestore (ms epoch).
+  // Populated from localStorage cache on first load, or from a live fetch.
+  lastFetched: {},
+  problemCount: null // sidebar badge count, fetched via a cheap aggregation query
 };
 
+// ── Persistent cache (localStorage) ─────────────────────────────────────────
+// Survives browser refresh / new tab / closing the browser — so re-opening
+// the dashboard shows the last known data instantly with zero Firestore
+// reads, until the person explicitly clicks a refresh button. This is what
+// makes "I just hit browser-refresh to see new data" free instead of
+// re-reading everything.
+const CACHE_PREFIX = 'tc_cache_';
+const CACHE_VERSION = 2; // bump this if the stored data shape ever changes
+
+function cacheKey(key, scope) {
+  return scope ? `${CACHE_PREFIX}${key}__${scope}` : `${CACHE_PREFIX}${key}`;
+}
+
+function loadFromCache(key, scope) {
+  try {
+    const raw = localStorage.getItem(cacheKey(key, scope));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed.v !== CACHE_VERSION) return null;
+    return parsed; // { v, data, fetchedAt }
+  } catch (e) {
+    console.warn('Cache read failed for', key, scope, e);
+    return null;
+  }
+}
+
+function saveToCache(key, scope, data, fetchedAt) {
+  try {
+    localStorage.setItem(cacheKey(key, scope), JSON.stringify({ v: CACHE_VERSION, data, fetchedAt }));
+  } catch (e) {
+    // Most likely storage quota exceeded — degrade gracefully, dashboard
+    // still works, it just won't persist across a browser refresh this time.
+    console.warn('Cache write skipped for', key, scope, '(storage full or unavailable)', e);
+  }
+}
+
+function clearCacheEntry(key, scope) {
+  try { localStorage.removeItem(cacheKey(key, scope)); } catch (e) { /* ignore */ }
+}
+
+function timeAgo(ms) {
+  if (!ms) return 'never';
+  const diffSec = Math.max(0, Math.round((Date.now() - ms) / 1000));
+  if (diffSec < 10) return 'just now';
+  if (diffSec < 60) return `${diffSec}s ago`;
+  const diffMin = Math.round(diffSec / 60);
+  if (diffMin < 60) return `${diffMin} min ago`;
+  const diffH = Math.round(diffMin / 60);
+  if (diffH < 24) return `${diffH}h ago`;
+  const diffD = Math.round(diffH / 24);
+  return `${diffD}d ago`;
+}
+
+function lastUpdatedLabel(...keys) {
+  const times = keys.map(k => window._state.lastFetched[k]).filter(Boolean);
+  if (times.length === 0) return 'Not loaded yet';
+  const oldest = Math.min(...times);
+  return `Updated ${timeAgo(oldest)}`;
+}
+
+// Reusable "Updated Xm ago  [⟳ Refresh]" control for every page header.
+// The refresh button always calls refreshCurrentPage(), which knows which
+// page is active and re-fetches only that page's own data (see
+// VIEW_LOADERS / ensureGroupDetailData) — never the whole dashboard.
+function refreshControlHtml(...keys) {
+  return `<div style="display:flex;align-items:center;gap:10px;">
+    <span style="font-size:11px;color:#aaa;" title="${keys.map(k => window._state.lastFetched[k] ? new Date(window._state.lastFetched[k]).toLocaleString('fr-FR') : '').filter(Boolean).join(', ')}">${lastUpdatedLabel(...keys)}</span>
+    <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px;" onclick="refreshCurrentPage()">⟳ Refresh</button>
+  </div>`;
+}
+
 window.exportDebugData = function() {
+  // Combine whatever's actually in memory right now: the full global list if
+  // the Problems page has been visited, plus any per-group scoped data from
+  // group detail pages — whichever collections happen to be populated.
+  const scopedInstallations = Object.values(window._state.installationsByGroup).flat();
+  const installations = window._state.installations.length > 0 ? window._state.installations : scopedInstallations;
   const data = {
-    installations: window._state.installations,
+    installations,
+    submissions: Object.values(window._state.submissionsByGroup).flat(),
+    messages: window._state.messages,
     groups: window._state.groups,
     apps: Object.values(window._state.apps),
   };
@@ -443,51 +523,138 @@ window.copyToClipboard = function(text) {
 };
 
 // ── Data loading ───────────────────────────────────────────────────────────
-// ── Lazy, cached collection fetchers ────────────────────────────────────────
-// Each fetcher only hits Firestore once per session (cached in window._state.loaded).
-// Call ensure*() at the top of any render function that needs that data.
+// ── Cached, persistent, force-refreshable collection fetchers ──────────────
+// Each fetcher checks (in order): in-memory this session -> localStorage
+// cache -> live Firestore fetch. Pass force=true to skip straight to a live
+// fetch (used by the per-page refresh buttons). Every live fetch updates
+// both in-memory state AND localStorage, plus records lastFetched so the
+// UI can show "Updated Xm ago".
 
-async function fetchCollection(name, key, orderByField) {
-  if (window._state.loaded[key]) return;
+async function fetchCollection(name, key, orderByField, force = false) {
+  if (!force) {
+    if (window._state.loaded[key]) return;
+    const cached = loadFromCache(key);
+    if (cached) {
+      hydrateCollection(key, cached.data);
+      window._state.lastFetched[key] = cached.fetchedAt;
+      window._state.loaded[key] = true;
+      return;
+    }
+  }
   const q = orderByField ? query(collection(db, name), orderBy(orderByField, 'desc')) : collection(db, name);
   const snap = await getDocs(q);
+  const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  hydrateCollection(key, data);
+  window._state.loaded[key] = true;
+  const fetchedAt = Date.now();
+  window._state.lastFetched[key] = fetchedAt;
+  saveToCache(key, null, data, fetchedAt);
+}
+
+function hydrateCollection(key, data) {
   if (key === 'apps' || key === 'users') {
     window._state[key] = {};
-    snap.docs.forEach(d => { window._state[key][d.id] = { id: d.id, ...d.data() }; });
+    data.forEach(d => { window._state[key][d.id] = d; });
   } else {
-    window._state[key] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    window._state[key] = data;
   }
-  window._state.loaded[key] = true;
 }
 
-async function ensureGroups() { await fetchCollection('testing_groups', 'groups', 'groupNumber'); }
-async function ensureApps() { await fetchCollection('apps', 'apps'); }
-async function ensureUsers() { await fetchCollection('users', 'users'); }
-async function ensureInstallations() { await fetchCollection('installations', 'installations'); }
-async function ensureSubmissions() { await fetchCollection('phase_submissions', 'submissions'); }
-async function ensureSummaries() { await fetchCollection('testing_summaries', 'summaries'); }
-async function ensureFlags() { await fetchCollection('flags', 'flags'); }
-async function ensureSingleTestApps() { await fetchCollection('single_test_apps', 'singleTestApps'); }
-async function ensureSingleTestSubmissions() { await fetchCollection('single_test_submissions', 'singleTestSubmissions'); }
-async function ensureMessages() { await fetchCollection('messages', 'messages'); }
+async function ensureGroups(force) { await fetchCollection('testing_groups', 'groups', 'groupNumber', force); }
+async function ensureApps(force) { await fetchCollection('apps', 'apps', undefined, force); }
+async function ensureUsers(force) { await fetchCollection('users', 'users', undefined, force); }
+async function ensureInstallations(force) { await fetchCollection('installations', 'installations', undefined, force); }
+async function ensureSubmissions(force) { await fetchCollection('phase_submissions', 'submissions', undefined, force); }
+async function ensureSummaries(force) { await fetchCollection('testing_summaries', 'summaries', undefined, force); }
+async function ensureFlags(force) { await fetchCollection('flags', 'flags', undefined, force); }
+async function ensureSingleTestApps(force) { await fetchCollection('single_test_apps', 'singleTestApps', undefined, force); }
+async function ensureSingleTestSubmissions(force) { await fetchCollection('single_test_submissions', 'singleTestSubmissions', undefined, force); }
 
-// Overview needs groups + apps + installations (badges/problems) + users (signup count) + singleTestApps (total app count)
-async function ensureOverviewData() {
-  await Promise.all([ensureGroups(), ensureApps(), ensureInstallations(), ensureUsers(), ensureSingleTestApps()]);
+// ── Group-scoped fetchers ────────────────────────────────────────────────
+// installations, submissions, and messages all grow forever as the platform
+// is used, and are only ever needed filtered to ONE group when viewing that
+// group's detail page. Fetching the entire collection on every visit was the
+// single biggest source of wasted reads. These fetch only what's needed for
+// the group being viewed, cached per-group both in memory and in
+// localStorage, and support force-refresh for the group detail page's own
+// refresh button.
+async function ensureScopedForGroup(name, stateKey, groupId, force = false) {
+  if (!force) {
+    if (window._state[stateKey][groupId]) return;
+    const cached = loadFromCache(name, groupId);
+    if (cached) {
+      window._state[stateKey][groupId] = cached.data;
+      window._state.lastFetched[`${name}__${groupId}`] = cached.fetchedAt;
+      if (stateKey === 'messagesByGroup') window._state.messages = Object.values(window._state.messagesByGroup).flat();
+      return;
+    }
+  }
+  const q = query(collection(db, name), where('groupId', '==', groupId));
+  const snap = await getDocs(q);
+  const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  window._state[stateKey][groupId] = data;
+  const fetchedAt = Date.now();
+  window._state.lastFetched[`${name}__${groupId}`] = fetchedAt;
+  saveToCache(name, groupId, data, fetchedAt);
+  if (stateKey === 'messagesByGroup') window._state.messages = Object.values(window._state.messagesByGroup).flat();
 }
 
-// Group detail additionally needs submissions (phase reviews) + messages (conversations)
-async function ensureGroupDetailData() {
-  await Promise.all([ensureGroups(), ensureApps(), ensureInstallations(), ensureSubmissions(), ensureMessages(), ensureUsers()]);
-}
+async function ensureInstallationsForGroup(groupId, force) { await ensureScopedForGroup('installations', 'installationsByGroup', groupId, force); }
+async function ensureSubmissionsForGroup(groupId, force) { await ensureScopedForGroup('phase_submissions', 'submissionsByGroup', groupId, force); }
+async function ensureMessagesForGroup(groupId, force) { await ensureScopedForGroup('messages', 'messagesByGroup', groupId, force); }
 
-window.loadAll = async function() {
-  document.getElementById('view-overview').innerHTML = '<div class="loading"><div class="spinner"></div>Loading data from Firestore…</div>';
+// ── Sidebar problem-count badge ─────────────────────────────────────────────
+// Shown on every page, so it can't depend on loading the full installations
+// collection. Uses an aggregation COUNT query instead — Firestore bills
+// count queries far more cheaply than reading every matching document
+// (roughly 1 read per 1000 docs counted, vs 1 read per doc for a normal
+// fetch). Falls back to '?' if the query fails (e.g. a composite index is
+// needed the first time — Firestore's error message includes a direct link
+// to auto-create it in the console).
+async function ensureProblemCount(force = false) {
+  if (!force && window._state.problemCount !== null) return;
+  const cached = !force ? loadFromCache('problemCount') : null;
+  if (cached) {
+    window._state.problemCount = cached.data;
+    window._state.lastFetched.problemCount = cached.fetchedAt;
+    return;
+  }
   try {
-    // Force-refresh: clear cache for whatever the current view needs, then reload it
-    Object.keys(window._state.loaded).forEach(k => { window._state.loaded[k] = false; });
-    await ensureOverviewData();
-    document.getElementById('lastRefresh').textContent = 'Refreshed ' + new Date().toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+    const q = query(collection(db, 'installations'), where('reportType', '!=', null));
+    const snap = await getCountFromServer(q);
+    window._state.problemCount = snap.data().count;
+    const fetchedAt = Date.now();
+    window._state.lastFetched.problemCount = fetchedAt;
+    saveToCache('problemCount', null, window._state.problemCount, fetchedAt);
+  } catch (e) {
+    console.warn('Problem count query failed (may need a Firestore index — check console for an auto-create link):', e);
+    window._state.problemCount = window._state.problemCount ?? '?';
+  }
+}
+
+// Overview needs groups + apps + users (signup count) + singleTestApps (total app count) + a cheap problem count
+async function ensureOverviewData(force) {
+  await Promise.all([ensureGroups(force), ensureApps(force), ensureUsers(force), ensureSingleTestApps(force), ensureProblemCount(force)]);
+}
+
+// Group detail needs groups + apps + users (global, small, shared) plus
+// installations/submissions/messages scoped to just this one group.
+async function ensureGroupDetailData(groupId, force) {
+  await Promise.all([
+    ensureGroups(force), ensureApps(force), ensureUsers(force),
+    ensureInstallationsForGroup(groupId, force),
+    ensureSubmissionsForGroup(groupId, force),
+    ensureMessagesForGroup(groupId, force),
+  ]);
+}
+
+// Initial load on sign-in: uses cache if available (instant, zero reads),
+// otherwise fetches fresh. This is NOT a force-refresh — see refreshOverview()
+// for the button that explicitly re-hits Firestore.
+window.loadAll = async function() {
+  document.getElementById('view-overview').innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
+  try {
+    await ensureOverviewData(false);
     buildSidebarGroups();
     renderView(window._state.currentView);
   } catch (e) {
@@ -498,8 +665,7 @@ window.loadAll = async function() {
 
 function buildSidebarGroups() {
   const list = document.getElementById('groupNavList');
-  const problems = window._state.installations.filter(i => i.reportType).length;
-  document.getElementById('problemBadge').textContent = problems;
+  document.getElementById('problemBadge').textContent = window._state.problemCount ?? '·';
   const activeGroups = window._state.groups.filter(g => g.status === 'active' || g.status === 'forming').sort((a,b) => (b.groupNumber||0) - (a.groupNumber||0));
   list.innerHTML = activeGroups.map(g => {
     const isActive = g.groupId === window._state.currentGroupId;
@@ -522,12 +688,22 @@ function phaseLabelShort(g) {
 // ── Views ──────────────────────────────────────────────────────────────────
 const VIEW_LOADERS = {
   overview: ensureOverviewData,
-  groups: ensureGroupDetailData,
-  feedback: async () => Promise.all([ensureSubmissions(), ensureApps(), ensureUsers()]),
-  problems: async () => Promise.all([ensureInstallations(), ensureApps(), ensureGroups(), ensureUsers()]),
-  summaries: async () => Promise.all([ensureSummaries(), ensureApps()]),
-  singletests: async () => Promise.all([ensureSingleTestApps(), ensureSingleTestSubmissions(), ensureUsers()]),
-  oldgroups: async () => Promise.all([ensureGroups(), ensureApps(), ensureUsers()]),
+  feedback: (force) => Promise.all([ensureSubmissions(force), ensureApps(force), ensureUsers(force)]),
+  problems: (force) => Promise.all([ensureInstallations(force), ensureApps(force), ensureGroups(force), ensureUsers(force)]),
+  summaries: (force) => Promise.all([ensureSummaries(force), ensureApps(force)]),
+  singletests: (force) => Promise.all([ensureSingleTestApps(force), ensureSingleTestSubmissions(force), ensureUsers(force)]),
+  oldgroups: (force) => Promise.all([ensureGroups(force), ensureApps(force), ensureUsers(force)]),
+};
+
+// Which lastFetched keys represent each page's data — used for the
+// "Updated Xm ago" label and to decide what a page's refresh button touches.
+const VIEW_DATA_KEYS = {
+  overview: ['groups', 'apps', 'users', 'singleTestApps', 'problemCount'],
+  feedback: ['submissions', 'apps', 'users'],
+  problems: ['installations', 'apps', 'groups', 'users'],
+  summaries: ['summaries', 'apps'],
+  singletests: ['singleTestApps', 'singleTestSubmissions', 'users'],
+  oldgroups: ['groups', 'apps', 'users'],
 };
 
 window.showView = async function(view) {
@@ -545,7 +721,7 @@ window.showView = async function(view) {
   if (needsFetch) {
     viewEl.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
     try {
-      await loader();
+      await loader(false);
     } catch (e) {
       viewEl.innerHTML = `<div class="loading" style="color:#dc2626;">Error loading data: ${e.message}</div>`;
       console.error('showView error:', e);
@@ -561,10 +737,43 @@ window.showView = async function(view) {
   }
 };
 
-function viewDataAlreadyLoaded(view) {
+// Called by the ⟳ Refresh button on every page. Force-refetches ONLY the
+// data that page actually depends on (see VIEW_LOADERS/ensureGroupDetailData),
+// bypassing the cache, then re-renders in place.
+window.refreshCurrentPage = async function() {
+  const view = window._state.currentView;
+  const groupId = window._state.currentGroupId;
+  const viewElId = view === 'groups' ? 'view-groups' : 'view-' + view;
+  const viewEl = document.getElementById(viewElId);
+  const prevHtml = viewEl.innerHTML;
+  viewEl.style.opacity = '0.5';
+  try {
+    if (view === 'groups' && groupId) {
+      await ensureGroupDetailData(groupId, true);
+      buildSidebarGroups();
+      renderGroupDetail(groupId);
+    } else {
+      const loader = VIEW_LOADERS[view];
+      if (loader) await loader(true);
+      buildSidebarGroups();
+      renderView(view);
+    }
+    showToast('Refreshed');
+  } catch (e) {
+    viewEl.innerHTML = prevHtml;
+    viewEl.style.opacity = '1';
+    showToast('Refresh failed — see console');
+    console.error('refreshCurrentPage error:', e);
+  }
+};
+
+function viewDataAlreadyLoaded(view, groupId) {
   const l = window._state.loaded;
-  if (view === 'overview') return l.groups && l.apps && l.installations && l.users && l.singleTestApps;
-  if (view === 'groups') return l.groups && l.apps && l.installations && l.submissions && l.messages && l.users;
+  if (view === 'overview') return l.groups && l.apps && l.users && l.singleTestApps && window._state.problemCount !== null;
+  if (view === 'groups') return l.groups && l.apps && l.users && groupId
+    && !!window._state.installationsByGroup[groupId]
+    && !!window._state.submissionsByGroup[groupId]
+    && !!window._state.messagesByGroup[groupId];
   if (view === 'feedback') return l.submissions && l.apps && l.users;
   if (view === 'problems') return l.installations && l.apps && l.groups && l.users;
   if (view === 'summaries') return l.summaries && l.apps;
@@ -581,10 +790,10 @@ window.showGroupDetail = async function(groupId) {
   const viewEl = document.getElementById('view-groups');
   viewEl.style.display = 'block';
 
-  if (!viewDataAlreadyLoaded('groups')) {
+  if (!viewDataAlreadyLoaded('groups', groupId)) {
     viewEl.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
     try {
-      await ensureGroupDetailData();
+      await ensureGroupDetailData(groupId, false);
     } catch (e) {
       viewEl.innerHTML = `<div class="loading" style="color:#dc2626;">Error loading group data: ${e.message}</div>`;
       console.error('showGroupDetail error:', e);
@@ -616,7 +825,7 @@ function renderOverview() {
   const forming = s.groups.filter(g => g.status === 'forming').length;
   const active = s.groups.filter(g => g.status === 'active').length;
   const completed = s.groups.filter(g => g.status === 'completed').length;
-  const problems = s.installations.filter(i => i.reportType).length;
+  const problems = s.problemCount ?? 0;
 
   // Total signups: every account in the users collection (implicitly excludes
   // deleted accounts, since deleteAccount hard-deletes the user doc)
@@ -644,7 +853,7 @@ function renderOverview() {
   let html = `
     <div class="page-header">
       <div><h2>Overview</h2><div class="subtitle">${new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}</div></div>
-      <button class="btn btn-primary" onclick="loadAll()">⟳ Refresh</button>
+      ${refreshControlHtml('groups', 'apps', 'users', 'singleTestApps', 'problemCount')}
     </div>
     <div class="stats-grid">
       <div class="stat-card accent-blue"><div class="label">Active groups</div><div class="value">${active}</div><div class="sub">${forming} forming</div></div>
@@ -747,8 +956,8 @@ function renderGroupDetail(groupId) {
   const g = window._state.groups.find(g => g.groupId === groupId);
   if (!g) return;
   const el = document.getElementById('view-groups');
-  const installs = window._state.installations.filter(i => i.groupId === groupId);
-  const subs = window._state.submissions.filter(s => s.groupId === groupId);
+  const installs = window._state.installationsByGroup[groupId] || [];
+  const subs = window._state.submissionsByGroup[groupId] || [];
   const problems = [...installs.filter(i => i.reportType)].sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
   const apps = (g.appIds || []).map(id => window._state.apps[id]).filter(Boolean);
 
@@ -947,7 +1156,10 @@ function renderGroupDetail(groupId) {
       <div><h2>Group #${g.groupNumber}</h2>
         <div class="subtitle">${phaseLabelShort(g)} · ${activeMemberSet.size}/${members.length} members active · ${installs.length} installs · ${subs.length} submissions</div>
       </div>
-      <div style="display:flex;gap:8px;align-items:center;">${phaseBadge(g)} ${deadlineHtml(groupDeadline(g))}</div>
+      <div style="display:flex;gap:14px;align-items:center;">
+        ${phaseBadge(g)} ${deadlineHtml(groupDeadline(g))}
+        ${refreshControlHtml(`installations__${groupId}`, `phase_submissions__${groupId}`, `messages__${groupId}`, 'groups', 'apps', 'users')}
+      </div>
     </div>
     ${phaseProgress(g)}
     <div style="padding:16px 24px 0;">
@@ -1029,7 +1241,7 @@ function renderGroupDetail(groupId) {
 function renderFeedback() {
   const s = window._state;
   const subs = [...s.submissions].sort((a,b) => (b.submittedAt?.seconds||0) - (a.submittedAt?.seconds||0));
-  let html = `<div class="page-header"><div><h2>All feedback</h2><div class="subtitle">${subs.length} submissions total</div></div></div>
+  let html = `<div class="page-header"><div><h2>All feedback</h2><div class="subtitle">${subs.length} submissions total</div></div>${refreshControlHtml('submissions', 'apps', 'users')}</div>
     <div class="filter-row">
       ${['all','1','1.5','2','2.5','3'].map(f => {
         const label = f==='all'?'All phases':f==='1.5'?'Quick Test A':f==='2.5'?'Quick Test B':`Phase ${f}`;
@@ -1076,7 +1288,7 @@ window.setFeedbackFilter = function(f) { window._state.groupFilter = f; renderFe
 // ── Problems ───────────────────────────────────────────────────────────────
 function renderProblems() {
   const problems = [...window._state.installations.filter(i => i.reportType)].sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
-  let html = `<div class="page-header"><div><h2>Problems</h2><div class="subtitle">${problems.length} open broken-app reports</div></div></div>
+  let html = `<div class="page-header"><div><h2>Problems</h2><div class="subtitle">${problems.length} open broken-app reports</div></div>${refreshControlHtml('installations', 'apps', 'groups', 'users')}</div>
     <div class="section"><div class="feedback-list">`;
   if (problems.length === 0) html += '<div class="empty">No problems reported 🎉</div>';
   problems.forEach(p => {
@@ -1097,7 +1309,7 @@ function renderProblems() {
 // ── Summaries ──────────────────────────────────────────────────────────────
 function renderSummaries() {
   const summs = [...window._state.summaries].sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
-  let html = `<div class="page-header"><div><h2>AI summaries</h2><div class="subtitle">${summs.length} total</div></div></div>
+  let html = `<div class="page-header"><div><h2>AI summaries</h2><div class="subtitle">${summs.length} total</div></div>${refreshControlHtml('summaries', 'apps')}</div>
     <div class="section"><div class="feedback-list">`;
   if (summs.length === 0) html += '<div class="empty">No summaries yet</div>';
   summs.forEach(s => {
@@ -1121,6 +1333,7 @@ function renderOldGroups() {
 
   let html = `<div class="page-header">
       <div><h2>Old Groups</h2><div class="subtitle">${oldGroups.length} completed testing cycle${oldGroups.length !== 1 ? 's' : ''}</div></div>
+      ${refreshControlHtml('groups', 'apps', 'users')}
     </div>
     <div class="section"><div class="groups-grid">`;
 
@@ -1281,6 +1494,7 @@ function renderSingleTests() {
 
   let html = `<div class="page-header">
       <div><h2>Single Tests</h2><div class="subtitle">${apps.length} apps · ${totalSuccess} successful tests · ${totalFailed} failed reports${hiddenCount ? ` · ${hiddenCount} hidden` : ''}</div></div>
+      ${refreshControlHtml('singleTestApps', 'singleTestSubmissions', 'users')}
     </div>
     <div class="section"><div class="groups-grid">`;
 
@@ -1422,8 +1636,20 @@ window.showSingleTestSubmissionDetail = function(subId) {
 };
 
 // ── Detail overlays ────────────────────────────────────────────────────────
+function findSubmissionById(subId) {
+  // Feedback page loads the full global list; Group detail only loads this
+  // group's slice. Check both so the same click handler works from either page.
+  const globalHit = window._state.submissions.find(s => s.id === subId);
+  if (globalHit) return globalHit;
+  for (const groupSubs of Object.values(window._state.submissionsByGroup)) {
+    const hit = groupSubs.find(s => s.id === subId);
+    if (hit) return hit;
+  }
+  return null;
+}
+
 window.showSubmissionDetail = function(subId) {
-  const sub = window._state.submissions.find(s => s.id === subId);
+  const sub = findSubmissionById(subId);
   if (!sub) return;
   const targetApp = window._state.apps[sub.appId];
   const tApp = Object.values(window._state.apps).find(a => a.ownerUid === sub.testerUid);
@@ -1460,11 +1686,13 @@ window.showSubmissionDetail = function(subId) {
 window.showUserDetail = async function(uid, groupId) {
   document.getElementById('detailPanel').innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
   document.getElementById('detailOverlay').style.display = 'flex';
-  await Promise.all([ensureUsers(), ensureSubmissions(), ensureApps()]);
+  const submissionsPromise = groupId ? ensureSubmissionsForGroup(groupId) : ensureSubmissions();
+  await Promise.all([ensureUsers(), submissionsPromise, ensureApps()]);
 
   const user = window._state.users[uid];
   const userApps = Object.values(window._state.apps).filter(a => a.ownerUid === uid);
-  const subs = window._state.submissions.filter(s => s.testerUid === uid && s.groupId === groupId);
+  const subsPool = groupId ? (window._state.submissionsByGroup[groupId] || []) : window._state.submissions;
+  const subs = subsPool.filter(s => s.testerUid === uid && s.groupId === groupId);
   let html = `<div class="detail-header"><h3>User ${shortUid(uid)}</h3><button class="close-btn" onclick="closeDetail()">✕</button></div>
   <div class="detail-body">
     <div class="detail-section"><h4>Profile</h4>
