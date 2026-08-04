@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<title>TestCircle Dashboard</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f0; color: #1a1a1a; font-size: 14px; }
+
+  /* Login screen */
+  #loginScreen { display: flex; align-items: center; justify-content: center; height: 100vh; background: #f5f5f0; }
+  .login-card { background: #fff; border-radius: 14px; border: 1px solid #e8e8e8; padding: 40px 48px; text-align: center; width: 360px; }
+  .login-card h1 { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+  .login-card p { font-size: 13px; color: #888; margin-bottom: 28px; }
+  .btn-google { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 11px 16px; border-radius: 8px; border: 1px solid #ddd; background: #fff; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.15s; }
+  .btn-google:hover { background: #f8f8f8; }
+  .btn-google svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .login-error { margin-top: 14px; font-size: 12px; color: #dc2626; }
+
+  /* Layout */
+  #appScreen { display: none; }
+  #app { display: flex; height: 100vh; overflow: hidden; }
+  #sidebar { width: 220px; background: #1a1a2e; color: #c8c8d8; display: flex; flex-direction: column; flex-shrink: 0; }
+  #main { flex: 1; overflow-y: auto; }
+
+  /* Sidebar */
+  .sidebar-header { padding: 20px 16px 12px; border-bottom: 1px solid #2a2a4a; display: flex; align-items: center; justify-content: space-between; }
+  .sidebar-header h1 { font-size: 16px; font-weight: 600; color: #fff; }
+  .sidebar-header p { font-size: 11px; color: #7878a0; margin-top: 2px; }
+  .sidebar-nav { padding: 8px 0; flex: 1; overflow-y: auto; }
+  .nav-section { padding: 8px 16px 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: #5a5a7a; font-weight: 600; }
+  .nav-item { display: flex; align-items: center; gap: 8px; padding: 8px 16px; cursor: pointer; font-size: 13px; color: #a0a0c0; transition: background 0.15s, color 0.15s; border-left: 2px solid transparent; }
+  .nav-item:hover { background: #252545; color: #e0e0f0; }
+  .nav-item.active { background: #252545; color: #fff; border-left-color: #6c6cff; }
+  .nav-item .badge { margin-left: auto; background: #3a3a6a; color: #a0a0e0; font-size: 10px; padding: 1px 6px; border-radius: 10px; }
+  .nav-item .badge.alert { background: #4a1a1a; color: #ff8080; }
+  .sidebar-footer { padding: 12px 16px; border-top: 1px solid #2a2a4a; font-size: 11px; color: #5a5a7a; }
+
+  /* Header */
+  .page-header { padding: 20px 24px 0; display: flex; align-items: center; justify-content: space-between; }
+  .page-header h2 { font-size: 20px; font-weight: 600; }
+  .page-header .subtitle { font-size: 12px; color: #888; margin-top: 2px; }
+  .btn { padding: 7px 14px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 500; transition: opacity 0.15s; }
+  .btn-primary { background: #6c6cff; color: #fff; }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-ghost { background: transparent; border: 1px solid #ddd; color: #444; }
+  .btn-ghost:hover { background: #f0f0f0; }
+
+  /* Stat cards */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; padding: 16px 24px; }
+  .stat-card { background: #fff; border-radius: 10px; padding: 14px 16px; border: 1px solid #e8e8e8; }
+  .stat-card .label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+  .stat-card .value { font-size: 26px; font-weight: 600; margin-top: 4px; color: #1a1a1a; }
+  .stat-card .sub { font-size: 11px; color: #888; margin-top: 2px; }
+  .stat-card.accent-blue .value { color: #4a6cf7; }
+  .stat-card.accent-green .value { color: #22a06b; }
+  .stat-card.accent-amber .value { color: #d97706; }
+  .stat-card.accent-red .value { color: #dc2626; }
+
+  /* Section */
+  .section { padding: 0 24px 24px; }
+  .section-title { font-size: 13px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+
+  /* Group cards */
+  .groups-grid { display: grid; gap: 12px; }
+  .group-card { background: #fff; border-radius: 10px; border: 1px solid #e8e8e8; overflow: hidden; }
+  .group-card-header { padding: 12px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #f0f0f0; cursor: pointer; }
+  .group-card-header:hover { background: #fafafa; }
+  .group-number { width: 32px; height: 32px; border-radius: 8px; background: #ededff; color: #5050cc; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .group-info { flex: 1; min-width: 0; }
+  .group-info h3 { font-size: 14px; font-weight: 600; }
+  .group-info .meta { font-size: 11px; color: #888; margin-top: 1px; }
+  .group-badges { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+  .badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .badge-forming { background: #fef3c7; color: #92400e; }
+  .badge-active { background: #d1fae5; color: #065f46; }
+  .badge-completed { background: #e0e7ff; color: #3730a3; }
+  .badge-phase { background: #ede9fe; color: #5b21b6; }
+  .badge-alert { background: #fee2e2; color: #991b1b; }
+  .badge-gray { background: #f3f4f6; color: #374151; }
+
+  /* Progress bar */
+  .phase-progress { padding: 10px 16px; background: #fafafa; border-bottom: 1px solid #f0f0f0; }
+  .progress-labels { display: flex; justify-content: space-between; font-size: 10px; color: #aaa; margin-bottom: 4px; }
+  .progress-track { height: 6px; background: #e8e8e8; border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+  .fill-forming { background: #f59e0b; }
+  .fill-p0 { background: #6366f1; }
+  .fill-p1 { background: #0ea5e9; }
+  .fill-p2 { background: #8b5cf6; }
+  .fill-p3 { background: #10b981; }
+  .fill-done { background: #6b7280; }
+
+  /* Members table */
+  .members-table { width: 100%; border-collapse: collapse; }
+  .members-table th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: #999; font-weight: 600; padding: 8px 16px; text-align: left; border-bottom: 1px solid #f0f0f0; background: #fafafa; }
+  .members-table td { padding: 9px 16px; border-bottom: 1px solid #f8f8f8; font-size: 13px; vertical-align: middle; }
+  .members-table tr:last-child td { border-bottom: none; }
+  .members-table tr:hover td { background: #fafafa; }
+  .uid-chip { font-family: monospace; font-size: 11px; color: #6c6cff; background: #f0f0ff; padding: 2px 6px; border-radius: 4px; cursor: pointer; }
+  .uid-chip:hover { background: #e0e0ff; }
+
+  /* Deadline */
+  .deadline { font-size: 12px; }
+  .deadline.urgent { color: #dc2626; font-weight: 600; }
+  .deadline.soon { color: #d97706; font-weight: 500; }
+  .deadline.ok { color: #888; }
+
+  /* Feedback panel */
+  .feedback-list { display: grid; gap: 10px; }
+  .feedback-card { background: #fff; border-radius: 10px; border: 1px solid #e8e8e8; padding: 14px 16px; }
+  .feedback-card .fc-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .feedback-card .fc-phase { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+  .fc-p1 { background: #dbeafe; color: #1d4ed8; }
+  .fc-p2 { background: #ede9fe; color: #6d28d9; }
+  .fc-p3 { background: #d1fae5; color: #065f46; }
+  .feedback-card .fc-app { font-size: 13px; font-weight: 600; }
+  .feedback-card .fc-tester { font-size: 11px; color: #888; margin-left: auto; }
+  .feedback-card .fc-field { margin-top: 6px; }
+  .feedback-card .fc-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #aaa; font-weight: 600; }
+  .feedback-card .fc-text { font-size: 13px; color: #333; margin-top: 2px; line-height: 1.5; }
+
+  /* Problems */
+  .problem-card { background: #fff; border-radius: 10px; border: 1px solid #fca5a5; padding: 14px 16px; }
+  .problem-card .pc-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+  .problem-card .pc-type { font-size: 11px; font-weight: 700; color: #dc2626; background: #fee2e2; padding: 2px 7px; border-radius: 10px; }
+  .problem-card .pc-app { font-size: 13px; font-weight: 600; }
+  .problem-card .pc-tester { font-size: 11px; color: #888; margin-left: auto; }
+  .problem-card .pc-comment { font-size: 13px; color: #555; margin-top: 4px; font-style: italic; }
+
+  /* Loading / empty */
+  .loading { text-align: center; padding: 48px; color: #aaa; }
+  .spinner { width: 28px; height: 28px; border: 3px solid #e8e8e8; border-top-color: #6c6cff; border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 12px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .empty { text-align: center; padding: 36px; color: #bbb; font-size: 13px; }
+
+  /* Detail panel overlay */
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 100; display: flex; align-items: flex-start; justify-content: flex-end; }
+  .detail-panel { width: 520px; height: 100vh; background: #fff; overflow-y: auto; box-shadow: -4px 0 24px rgba(0,0,0,0.12); }
+  .detail-header { padding: 16px 20px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; gap: 10px; position: sticky; top: 0; background: #fff; z-index: 1; }
+  .detail-header h3 { font-size: 16px; font-weight: 600; flex: 1; }
+  .close-btn { width: 28px; height: 28px; border-radius: 50%; border: none; background: #f0f0f0; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+  .close-btn:hover { background: #e0e0e0; }
+  .detail-body { padding: 16px 20px; }
+  .detail-section { margin-bottom: 20px; }
+  .detail-section h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #888; font-weight: 600; margin-bottom: 8px; }
+  .kv-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #f5f5f5; font-size: 13px; }
+  .kv-row .k { color: #888; }
+  .kv-row .v { font-weight: 500; text-align: right; max-width: 65%; word-break: break-all; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+
+  /* Toast */
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1a1a2e; color: #fff; padding: 8px 16px; border-radius: 8px; font-size: 13px; z-index: 999; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+
+  .collapse-icon { font-size: 10px; color: #aaa; margin-left: 4px; transition: transform 0.2s; }
+  .collapse-icon.open { transform: rotate(180deg); }
+  .group-body { display: none; }
+  .group-body.open { display: block; }
+
+  .tag-evicted { background: #fee2e2; color: #991b1b; font-size: 10px; padding: 1px 5px; border-radius: 4px; font-weight: 600; }
+  .tag-active-member { background: #d1fae5; color: #065f46; font-size: 10px; padding: 1px 5px; border-radius: 4px; font-weight: 600; }
+
+  .inactivity-bar { display: flex; align-items: center; gap: 6px; }
+  .inactivity-track { flex: 1; height: 4px; background: #e8e8e8; border-radius: 2px; overflow: hidden; }
+  .inactivity-fill { height: 100%; border-radius: 2px; }
+  .fill-safe { background: #10b981; }
+  .fill-warn { background: #f59e0b; }
+  .fill-danger { background: #ef4444; }
+
+  .filter-row { display: flex; gap: 8px; padding: 0 24px 12px; flex-wrap: wrap; }
+  .filter-btn { padding: 4px 10px; border-radius: 12px; border: 1px solid #ddd; background: #fff; font-size: 12px; cursor: pointer; color: #555; }
+  .filter-btn.active { background: #6c6cff; border-color: #6c6cff; color: #fff; }
+
+  .refresh-indicator { font-size: 11px; color: #5a5a7a; margin-top: 2px; }
+
+  .user-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; vertical-align: middle; margin-right: 6px; }
+  .signout-btn { font-size: 11px; color: #5a5a7a; background: none; border: none; cursor: pointer; padding: 0; }
+  .signout-btn:hover { color: #a0a0c0; }
+
+  /* Screenshot popup */
+  .screenshot-thumb { display: inline-block; margin-top: 6px; }
+  .screenshot-thumb img { width: 48px; height: 48px; object-fit: cover; border-radius: 5px; border: 1px solid #e8e8e8; cursor: pointer; transition: opacity 0.15s; vertical-align: middle; }
+  .screenshot-thumb img:hover { opacity: 0.8; }
+  .screenshot-link { font-size: 11px; color: #6c6cff; cursor: pointer; text-decoration: underline; }
+  .screenshot-link:hover { opacity: 0.8; }
+  #screenshotOverlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200; display: none; align-items: center; justify-content: center; }
+  #screenshotOverlay.open { display: flex; }
+  #screenshotOverlay img { max-width: 90vw; max-height: 88vh; border-radius: 8px; object-fit: contain; box-shadow: 0 8px 40px rgba(0,0,0,0.5); }
+  #screenshotOverlay .sc-close { position: fixed; top: 18px; right: 22px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); border: none; color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  #screenshotOverlay .sc-close:hover { background: rgba(255,255,255,0.28); }
+</style>
+</head>
+<body>
+
+<!-- Login screen -->
+<div id="loginScreen">
+  <div class="login-card">
+    <h1>TestCircle</h1>
+    <p>Admin Dashboard — sign in with your Google account to continue</p>
+    <button class="btn-google" onclick="signIn()">
+      <svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
+      Sign in with Google
+    </button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- Main app -->
+<div id="appScreen">
+  <div id="app">
+    <div id="sidebar">
+      <div class="sidebar-header">
+        <div>
+          <h1>TestCircle</h1>
+          <p>Admin Dashboard</p>
+        </div>
+      </div>
+      <nav class="sidebar-nav" id="sidebarNav">
+        <div class="nav-section">Overview</div>
+        <div class="nav-item active" onclick="showView('overview')" id="nav-overview">
+          <span>📊</span> Overview
+        </div>
+        <div class="nav-section" style="margin-top:8px;">Groups</div>
+        <div id="groupNavList"></div>
+        <div class="nav-section" style="margin-top:8px;">Data</div>
+        <div class="nav-item" onclick="showView('feedback')" id="nav-feedback">
+          <span>💬</span> All feedback
+        </div>
+        <div class="nav-item" onclick="showView('problems')" id="nav-problems">
+          <span>🔴</span> Problems <span class="badge alert" id="problemBadge">0</span>
+        </div>
+        <div class="nav-item" onclick="showView('summaries')" id="nav-summaries">
+          <span>✨</span> AI Summaries
+        </div>
+        <div class="nav-item" onclick="showView('singletests')" id="nav-singletests">
+          <span>🎯</span> Single Tests
+        </div>
+        <div class="nav-item" onclick="showView('oldgroups')" id="nav-oldgroups">
+          <span>🗄️</span> Old Groups
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <div id="userInfo" style="margin-bottom:4px;"></div>
+        <div id="lastRefresh" class="refresh-indicator">—</div>
+        <button class="signout-btn" onclick="signOut()">Sign out</button>
+        <button class="signout-btn" style="margin-top:4px;" onclick="exportDebugData()">⬇ Export debug JSON</button>
+      </div>
+    </div>
+
+    <div id="main">
+      <div id="view-overview"></div>
+      <div id="view-groups" style="display:none"></div>
+      <div id="view-feedback" style="display:none"></div>
+      <div id="view-problems" style="display:none"></div>
+      <div id="view-summaries" style="display:none"></div>
+      <div id="view-singletests" style="display:none"></div>
+      <div id="view-oldgroups" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<div id="detailOverlay" style="display:none" class="overlay" onclick="closeDetail(event)">
+  <div class="detail-panel" id="detailPanel"></div>
+</div>
+
+<div id="screenshotOverlay" onclick="closeScreenshot(event)">
+  <button class="sc-close" onclick="closeScreenshot()">✕</button>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+    <img id="screenshotImg" src="" alt="Screenshot">
+    <div id="screenshotCaption" style="color:#fff;font-size:13px;background:rgba(0,0,0,0.5);padding:8px 16px;border-radius:12px;display:none;white-space:pre-line;text-align:center;line-height:1.5;"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, getDocs, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as fbSignOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDr1ldV2_dNgqZJ4OJjI4Wpe7esXlPxTU8",
+  authDomain: "testcircle-prod.firebaseapp.com",
+  projectId: "testcircle-prod",
+  storageBucket: "testcircle-prod.firebasestorage.app",
+  messagingSenderId: "342289143746",
+  appId: "1:342289143746:web:aeb1c150d8d726c3b8a85b"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+// ── Auth ───────────────────────────────────────────────────────────────────
+window.signIn = async function() {
+  document.getElementById('loginError').textContent = '';
+  try {
+    await signInWithPopup(auth, provider);
+  } catch (e) {
+    document.getElementById('loginError').textContent = e.message;
+  }
+};
+
+window.signOut = async function() {
+  await fbSignOut(auth);
+};
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appScreen').style.display = 'block';
+    document.getElementById('userInfo').textContent = user.email || user.displayName || '';
+    loadAll();
+  } else {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('appScreen').style.display = 'none';
+  }
+});
+
+// ── State ──────────────────────────────────────────────────────────────────
+window._state = {
+  groups: [], apps: {}, users: {}, installations: [],
+  submissions: [], summaries: [], flags: [],
+  singleTestApps: [], singleTestSubmissions: [],
+  messages: [],
+  currentView: 'overview', groupFilter: 'all', currentGroupId: null,
+  expandedSingleTestApps: new Set(),
+  expandedOldGroups: new Set(),
+  loaded: {
+    groups: false, apps: false, users: false, installations: false,
+    submissions: false, summaries: false, flags: false,
+    singleTestApps: false, singleTestSubmissions: false,
+    messages: false
+  }
+};
+
+window.exportDebugData = function() {
+  const data = {
+    installations: window._state.installations,
+    groups: window._state.groups,
+    apps: Object.values(window._state.apps),
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'testcircle-debug.json';
+  a.click();
+};
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function ts(timestamp) {
+  if (!timestamp) return '—';
+  const d = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
+  return d.toLocaleDateString('fr-FR', { day:'2-digit', month:'short' }) + ' ' +
+         d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+}
+
+function hoursUntil(timestamp) {
+  if (!timestamp) return null;
+  const d = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
+  return (d - Date.now()) / 3600000;
+}
+
+function deadlineHtml(timestamp) {
+  const h = hoursUntil(timestamp);
+  if (h === null) return '<span class="deadline ok">—</span>';
+  if (h < 0) return `<span class="deadline urgent">Expired ${Math.abs(h).toFixed(0)}h ago</span>`;
+  if (h < 24) return `<span class="deadline urgent">⚠ ${h.toFixed(0)}h left</span>`;
+  if (h < 72) return `<span class="deadline soon">${h.toFixed(0)}h left</span>`;
+  return `<span class="deadline ok">${(h/24).toFixed(1)}d left</span>`;
+}
+
+// Compute Phase 0A deadline from timerStartedAt + duration constants
+const PHASE_0A_DURATION_HOURS = 36;
+const PHASE_0A_EXTENSION_HOURS = 12;
+const PHASE_0B_DURATION_HOURS = 12;
+const INACTIVITY_EVICTION_DAYS = 6;
+
+function groupDeadline(group) {
+  if (group.status === 'forming') {
+    // Phase 0A: timerStartedAt + 36h (or 18h if extended)
+    if (!group.timerStartedAt) return null;
+    const startMs = group.timerStartedAt.seconds * 1000;
+    const durationMs = (group.phase0AExtensionGranted ? PHASE_0A_EXTENSION_HOURS : PHASE_0A_DURATION_HOURS) * 3600000;
+    return { seconds: Math.floor((startMs + durationMs) / 1000) };
+  }
+  if (group.status === 'active' && group.currentPhase === 0) {
+    // Phase 0B: phaseDeadline stored on doc
+    return group.phaseDeadline || null;
+  }
+  // Phases 1-3: phaseDeadline stored on doc
+  return group.phaseDeadline || null;
+}
+
+function phaseBadge(group) {
+  if (group.status === 'forming') return '<span class="badge badge-forming">Forming</span>';
+  if (group.status === 'completed') return '<span class="badge badge-completed">Completed</span>';
+  const p = group.currentPhase;
+  const s = group.stage;
+  if (p === 0) return '<span class="badge badge-phase">Phase 0B</span>';
+  if (s === 'checkin') return `<span class="badge badge-phase">P${p} Quick Test</span>`;
+  return `<span class="badge badge-phase">Phase ${p}</span>`;
+}
+
+function phaseProgress(group) {
+  let pct = 0; let fillClass = 'fill-forming';
+  if (group.status === 'forming') { pct = 0; fillClass = 'fill-forming'; }
+  else if (group.status === 'completed') { pct = 100; fillClass = 'fill-done'; }
+  else if (group.currentPhase === 0) { pct = 8; fillClass = 'fill-p0'; }
+  else if (group.currentPhase === 1 && group.stage === 'review') { pct = 25; fillClass = 'fill-p1'; }
+  else if (group.currentPhase === 1 && group.stage === 'checkin') { pct = 42; fillClass = 'fill-p1'; }
+  else if (group.currentPhase === 2 && group.stage === 'review') { pct = 58; fillClass = 'fill-p2'; }
+  else if (group.currentPhase === 2 && group.stage === 'checkin') { pct = 72; fillClass = 'fill-p2'; }
+  else if (group.currentPhase === 3) { pct = 85; fillClass = 'fill-p3'; }
+  const rightLabel = group.status === 'forming' ? (group.phase0AExtensionGranted ? '18h window' : '36h window') :
+                     group.currentPhase === 0 ? '18h install window' : '14 days';
+  return `<div class="phase-progress">
+    <div class="progress-labels"><span>Start</span><span>${rightLabel}</span></div>
+    <div class="progress-track"><div class="progress-fill ${fillClass}" style="width:${pct}%"></div></div>
+  </div>`;
+}
+
+function shortUid(uid) { return uid ? uid.substring(0, 8) + '…' : '—'; }
+function playStoreUrl(packageName) { return packageName ? `https://play.google.com/store/apps/details?id=${packageName}` : null; }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+window.copyToClipboard = function(text) {
+  navigator.clipboard.writeText(text).then(() => showToast('Copied!'));
+};
+
+// ── Data loading ───────────────────────────────────────────────────────────
+// ── Lazy, cached collection fetchers ────────────────────────────────────────
+// Each fetcher only hits Firestore once per session (cached in window._state.loaded).
+// Call ensure*() at the top of any render function that needs that data.
+
+async function fetchCollection(name, key, orderByField) {
+  if (window._state.loaded[key]) return;
+  const q = orderByField ? query(collection(db, name), orderBy(orderByField, 'desc')) : collection(db, name);
+  const snap = await getDocs(q);
+  if (key === 'apps' || key === 'users') {
+    window._state[key] = {};
+    snap.docs.forEach(d => { window._state[key][d.id] = { id: d.id, ...d.data() }; });
+  } else {
+    window._state[key] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  }
+  window._state.loaded[key] = true;
+}
+
+async function ensureGroups() { await fetchCollection('testing_groups', 'groups', 'groupNumber'); }
+async function ensureApps() { await fetchCollection('apps', 'apps'); }
+async function ensureUsers() { await fetchCollection('users', 'users'); }
+async function ensureInstallations() { await fetchCollection('installations', 'installations'); }
+async function ensureSubmissions() { await fetchCollection('phase_submissions', 'submissions'); }
+async function ensureSummaries() { await fetchCollection('testing_summaries', 'summaries'); }
+async function ensureFlags() { await fetchCollection('flags', 'flags'); }
+async function ensureSingleTestApps() { await fetchCollection('single_test_apps', 'singleTestApps'); }
+async function ensureSingleTestSubmissions() { await fetchCollection('single_test_submissions', 'singleTestSubmissions'); }
+async function ensureMessages() { await fetchCollection('messages', 'messages'); }
+
+// Overview needs groups + apps + installations (badges/problems) + users (signup count) + singleTestApps (total app count)
+async function ensureOverviewData() {
+  await Promise.all([ensureGroups(), ensureApps(), ensureInstallations(), ensureUsers(), ensureSingleTestApps()]);
+}
+
+// Group detail additionally needs submissions (phase reviews) + messages (conversations)
+async function ensureGroupDetailData() {
+  await Promise.all([ensureGroups(), ensureApps(), ensureInstallations(), ensureSubmissions(), ensureMessages(), ensureUsers()]);
+}
+
+window.loadAll = async function() {
+  document.getElementById('view-overview').innerHTML = '<div class="loading"><div class="spinner"></div>Loading data from Firestore…</div>';
+  try {
+    // Force-refresh: clear cache for whatever the current view needs, then reload it
+    Object.keys(window._state.loaded).forEach(k => { window._state.loaded[k] = false; });
+    await ensureOverviewData();
+    document.getElementById('lastRefresh').textContent = 'Refreshed ' + new Date().toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+    buildSidebarGroups();
+    renderView(window._state.currentView);
+  } catch (e) {
+    document.getElementById('view-overview').innerHTML = `<div class="loading" style="color:#dc2626;">Error: ${e.message}</div>`;
+    console.error(e);
+  }
+};
+
+function buildSidebarGroups() {
+  const list = document.getElementById('groupNavList');
+  const problems = window._state.installations.filter(i => i.reportType).length;
+  document.getElementById('problemBadge').textContent = problems;
+  const activeGroups = window._state.groups.filter(g => g.status === 'active' || g.status === 'forming').sort((a,b) => (b.groupNumber||0) - (a.groupNumber||0));
+  list.innerHTML = activeGroups.map(g => {
+    const isActive = g.groupId === window._state.currentGroupId;
+    return `<div class="nav-item ${isActive ? 'active' : ''}" onclick="showGroupDetail('${g.groupId}')">
+      <span>#${g.groupNumber}</span>
+      <span style="flex:1;font-size:12px;">${phaseLabelShort(g)}</span>
+      <span class="badge">${g.activeMemberUids?.length || 0}</span>
+    </div>`;
+  }).join('');
+}
+
+function phaseLabelShort(g) {
+  if (g.status === 'forming') return 'Forming';
+  if (g.status === 'completed') return 'Done';
+  if (g.currentPhase === 0) return 'Phase 0B';
+  if (g.stage === 'checkin') return `P${g.currentPhase} QT`;
+  return `Phase ${g.currentPhase}`;
+}
+
+// ── Views ──────────────────────────────────────────────────────────────────
+const VIEW_LOADERS = {
+  overview: ensureOverviewData,
+  groups: ensureGroupDetailData,
+  feedback: async () => Promise.all([ensureSubmissions(), ensureApps(), ensureUsers()]),
+  problems: async () => Promise.all([ensureInstallations(), ensureApps(), ensureGroups(), ensureUsers()]),
+  summaries: async () => Promise.all([ensureSummaries(), ensureApps()]),
+  singletests: async () => Promise.all([ensureSingleTestApps(), ensureSingleTestSubmissions(), ensureUsers()]),
+  oldgroups: async () => Promise.all([ensureGroups(), ensureApps(), ensureUsers()]),
+};
+
+window.showView = async function(view) {
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const navEl = document.getElementById('nav-' + view);
+  if (navEl) navEl.classList.add('active');
+  window._state.currentView = view;
+  window._state.currentGroupId = null;
+  document.querySelectorAll('[id^="view-"]').forEach(el => el.style.display = 'none');
+  const viewEl = document.getElementById('view-' + view);
+  viewEl.style.display = 'block';
+
+  const loader = VIEW_LOADERS[view];
+  const needsFetch = loader && !viewDataAlreadyLoaded(view);
+  if (needsFetch) {
+    viewEl.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
+    try {
+      await loader();
+    } catch (e) {
+      viewEl.innerHTML = `<div class="loading" style="color:#dc2626;">Error loading data: ${e.message}</div>`;
+      console.error('showView error:', e);
+      return;
+    }
+  }
+  buildSidebarGroups();
+  try {
+    renderView(view);
+  } catch (e) {
+    viewEl.innerHTML = `<div class="loading" style="color:#dc2626;">Error rendering view: ${e.message}</div>`;
+    console.error('renderView error:', e);
+  }
+};
+
+function viewDataAlreadyLoaded(view) {
+  const l = window._state.loaded;
+  if (view === 'overview') return l.groups && l.apps && l.installations && l.users && l.singleTestApps;
+  if (view === 'groups') return l.groups && l.apps && l.installations && l.submissions && l.messages && l.users;
+  if (view === 'feedback') return l.submissions && l.apps && l.users;
+  if (view === 'problems') return l.installations && l.apps && l.groups && l.users;
+  if (view === 'summaries') return l.summaries && l.apps;
+  if (view === 'singletests') return l.singleTestApps && l.singleTestSubmissions && l.users;
+  if (view === 'oldgroups') return l.groups && l.apps && l.users;
+  return true;
+}
+
+window.showGroupDetail = async function(groupId) {
+  window._state.currentGroupId = groupId;
+  window._state.currentView = 'groups';
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('[id^="view-"]').forEach(el => el.style.display = 'none');
+  const viewEl = document.getElementById('view-groups');
+  viewEl.style.display = 'block';
+
+  if (!viewDataAlreadyLoaded('groups')) {
+    viewEl.innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
+    try {
+      await ensureGroupDetailData();
+    } catch (e) {
+      viewEl.innerHTML = `<div class="loading" style="color:#dc2626;">Error loading group data: ${e.message}</div>`;
+      console.error('showGroupDetail error:', e);
+      return;
+    }
+  }
+  buildSidebarGroups();
+  try {
+    renderGroupDetail(groupId);
+  } catch (e) {
+    viewEl.innerHTML = `<div class="loading" style="color:#dc2626;">Error rendering group: ${e.message}</div>`;
+    console.error('renderGroupDetail error:', e);
+  }
+};
+
+function renderView(view) {
+  if (view === 'overview') renderOverview();
+  else if (view === 'groups') renderGroupsList();
+  else if (view === 'feedback') renderFeedback();
+  else if (view === 'problems') renderProblems();
+  else if (view === 'summaries') renderSummaries();
+  else if (view === 'singletests') renderSingleTests();
+  else if (view === 'oldgroups') renderOldGroups();
+}
+
+// ── Overview ───────────────────────────────────────────────────────────────
+function renderOverview() {
+  const s = window._state;
+  const forming = s.groups.filter(g => g.status === 'forming').length;
+  const active = s.groups.filter(g => g.status === 'active').length;
+  const completed = s.groups.filter(g => g.status === 'completed').length;
+  const problems = s.installations.filter(i => i.reportType).length;
+
+  // Total signups: every account in the users collection (implicitly excludes
+  // deleted accounts, since deleteAccount hard-deletes the user doc)
+  const totalSignups = Object.keys(s.users).length;
+
+  // Active participants: users who submitted an app to a group test and were
+  // never evicted (groupId is only cleared to null on eviction — see index.ts
+  // _evictUser — so this includes users whose cycle already completed).
+  const activeParticipants = new Set(
+    Object.values(s.apps).filter(a => a.groupId).map(a => a.ownerUid)
+  ).size;
+
+  // Total unique apps submitted to the platform: regular group-testing apps
+  // (apps collection) + single-test apps (single_test_apps collection).
+  // Deduplicated by packageName in case the same app was submitted twice
+  // (e.g. resubmitted after eviction, or submitted to both systems).
+  const groupTestPackages = Object.values(s.apps).map(a => a.packageName).filter(Boolean);
+  const singleTestPackages = s.singleTestApps.map(a => a.packageName).filter(Boolean);
+  const totalUniqueApps = new Set([...groupTestPackages, ...singleTestPackages]).size;
+
+  const activeGroups = s.groups
+    .filter(g => g.status === 'active' || g.status === 'forming')
+    .sort((a, b) => (b.groupNumber || 0) - (a.groupNumber || 0));
+
+  let html = `
+    <div class="page-header">
+      <div><h2>Overview</h2><div class="subtitle">${new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}</div></div>
+      <button class="btn btn-primary" onclick="loadAll()">⟳ Refresh</button>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card accent-blue"><div class="label">Active groups</div><div class="value">${active}</div><div class="sub">${forming} forming</div></div>
+      <div class="stat-card accent-amber"><div class="label">Completed cycles</div><div class="value">${completed}</div></div>
+      <div class="stat-card accent-green"><div class="label">Total signups</div><div class="value">${totalSignups}</div><div class="sub">Google accounts, not deleted</div></div>
+      <div class="stat-card accent-green"><div class="label">Active participants</div><div class="value">${activeParticipants}</div><div class="sub">joined a group, never evicted</div></div>
+      <div class="stat-card accent-amber"><div class="label">Total apps submitted</div><div class="value">${totalUniqueApps}</div><div class="sub">group tests + single tests</div></div>
+      <div class="stat-card accent-red"><div class="label">Open problems</div><div class="value">${problems}</div><div class="sub">broken app reports</div></div>
+    </div>`;
+
+  html += `<div class="section"><div class="section-title">Active & forming groups</div><div class="groups-grid">`;
+  if (activeGroups.length === 0) html += '<div class="empty">No active groups</div>';
+  activeGroups.forEach(g => { html += groupCardHtml(g, false); });
+  html += `</div></div>`;
+
+  document.getElementById('view-overview').innerHTML = html;
+}
+
+function groupCardHtml(g, expanded) {
+  const activeCount = g.activeMemberUids?.length || 0;
+  const totalCount = g.memberUids && g.memberUids.length ? g.memberUids.length : activeCount;
+  const deadline = groupDeadline(g);
+  const h = hoursUntil(deadline);
+  const urgent = h !== null && h >= 0 && h < 24;
+  return `<div class="group-card" style="${urgent ? 'border-color:#fca5a5;' : ''}">
+    <div class="group-card-header" onclick="toggleGroup('${g.groupId}')">
+      <div class="group-number">${g.groupNumber}</div>
+      <div class="group-info">
+        <h3>Group #${g.groupNumber}</h3>
+        <div class="meta">${activeCount}${totalCount !== activeCount ? `/${totalCount}` : ''} member${totalCount !== 1 ? 's' : ''}${totalCount !== activeCount ? ' active' : ''} · Created ${ts(g.createdAt)}</div>
+      </div>
+      <div class="group-badges">
+        ${phaseBadge(g)}
+        ${urgent ? '<span class="badge badge-alert">⚠ &lt;24h</span>' : ''}
+        <span class="collapse-icon ${expanded ? 'open' : ''}" id="icon-${g.groupId}">▼</span>
+      </div>
+    </div>
+    ${phaseProgress(g)}
+    <div class="group-body ${expanded ? 'open' : ''}" id="body-${g.groupId}">
+      ${expanded ? groupBodyHtml(g) : ''}
+    </div>
+  </div>`;
+}
+
+function groupBodyHtml(g) {
+  const apps = (g.appIds || []).map(id => window._state.apps[id]).filter(Boolean);
+  const activeMemberSet = new Set(g.activeMemberUids || []);
+  const allMembers = g.memberUids && g.memberUids.length ? g.memberUids : (g.activeMemberUids || []);
+  const rows = allMembers.map(uid => {
+    const app = apps.find(a => a.ownerUid === uid);
+    const evicted = !activeMemberSet.has(uid);
+    const lastAct = g.lastActivityAt?.[uid];
+    const daysInactive = lastAct ? (Date.now() - lastAct.seconds * 1000) / 86400000 : null;
+    const inactPct = daysInactive !== null ? Math.min(100, (daysInactive / INACTIVITY_EVICTION_DAYS) * 100) : 0;
+    const inactClass = inactPct > 80 ? 'fill-danger' : inactPct > 50 ? 'fill-warn' : 'fill-safe';
+    return `<tr style="${evicted ? 'opacity:0.55;' : ''}">
+      <td><span class="uid-chip" onclick="showUserDetail('${uid}','${g.groupId}')" title="Click to view user details">${shortUid(uid)}</span></td>
+      <td>${app ? `${app.iconUrl ? `<img src="${app.iconUrl}" style="width:22px;height:22px;border-radius:5px;object-fit:cover;vertical-align:middle;margin-right:6px;">` : ''}${app.packageName ? `<a href="${playStoreUrl(app.packageName)}" target="_blank" rel="noopener" style="color:#1a1a1a;text-decoration:none;" title="Open on Play Store" onclick="event.stopPropagation()"><strong>${app.appName}</strong><br><small style="color:#888;">${app.packageName}</small></a>` : `<strong>${app.appName}</strong>`}` : '<span style="color:#aaa;">—</span>'}</td>
+      <td>${evicted ? '<span class="tag-evicted">Evicted</span>' : '<span class="tag-active-member">Active</span>'}</td>
+      <td>${evicted ? '<span style="font-size:11px;color:#ccc;">—</span>' : `<div class="inactivity-bar"><div class="inactivity-track"><div class="inactivity-fill ${inactClass}" style="width:${inactPct.toFixed(0)}%"></div></div><span style="font-size:11px;color:#888;white-space:nowrap;">${daysInactive !== null ? daysInactive.toFixed(1)+'d' : '—'}</span></div>`}</td>
+      <td style="text-align:right"><button class="btn btn-ghost" style="font-size:11px;padding:3px 8px;" onclick="showUserDetail('${uid}','${g.groupId}')">View</button></td>
+    </tr>`;
+  }).join('');
+
+  return `<div style="padding:10px 0 4px;">
+    <div style="padding:4px 16px 8px;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:12px;color:#888;">Deadline: ${deadlineHtml(groupDeadline(g))} · ${activeMemberSet.size}/${allMembers.length} active</span>
+      <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="showGroupDetail('${g.groupId}')">Full detail →</button>
+    </div>
+    <table class="members-table">
+      <thead><tr><th>User</th><th>App</th><th>Status</th><th>Inactivity (6d)</th><th></th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:16px;">No members yet</td></tr>'}</tbody>
+    </table>
+  </div>`;
+}
+
+window.toggleGroup = function(groupId) {
+  const body = document.getElementById('body-' + groupId);
+  const icon = document.getElementById('icon-' + groupId);
+  if (!body) return;
+  const isOpen = body.classList.contains('open');
+  if (!isOpen && body.innerHTML.trim() === '') {
+    const g = window._state.groups.find(g => g.groupId === groupId);
+    if (g) body.innerHTML = groupBodyHtml(g);
+  }
+  body.classList.toggle('open', !isOpen);
+  if (icon) icon.classList.toggle('open', !isOpen);
+};
+
+// ── Group detail ───────────────────────────────────────────────────────────
+function renderGroupsList() {
+  if (!window._state.currentGroupId) {
+    document.getElementById('view-groups').innerHTML = '<div class="empty" style="padding:60px;">Select a group from the sidebar</div>';
+    return;
+  }
+  renderGroupDetail(window._state.currentGroupId);
+}
+
+function renderGroupDetail(groupId) {
+  const g = window._state.groups.find(g => g.groupId === groupId);
+  if (!g) return;
+  const el = document.getElementById('view-groups');
+  const installs = window._state.installations.filter(i => i.groupId === groupId);
+  const subs = window._state.submissions.filter(s => s.groupId === groupId);
+  const problems = [...installs.filter(i => i.reportType)].sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
+  const apps = (g.appIds || []).map(id => window._state.apps[id]).filter(Boolean);
+
+  // Full member list (includes evicted) vs active-only, so nothing silently disappears
+  const activeMemberSet = new Set(g.activeMemberUids || []);
+  const members = g.memberUids && g.memberUids.length ? g.memberUids : (g.activeMemberUids || []);
+  const isEvicted = (uid) => !activeMemberSet.has(uid);
+
+  // Install matrix
+  const matrixHeaders = apps.map(a => `<th style="font-size:11px;padding:6px 10px;white-space:nowrap;">${a.appName || a.appId}</th>`).join('');
+  let installsDone = 0;
+  let installsExpected = 0;
+  const matrixRows = members.map(uid => {
+    const userApp = apps.find(a => a.ownerUid === uid);
+    const evicted = isEvicted(uid);
+    const cells = apps.map(app => {
+      if (app.ownerUid === uid) return '<td style="background:#f5f5f5;text-align:center;color:#ccc;">—</td>';
+      const ownerEvicted = isEvicted(app.ownerUid);
+      const inst = installs.find(i => i.testerUid === uid && i.appId === app.appId);
+
+      // Real data always wins over the eviction marker — an evicted tester
+      // (or an evicted app owner) may still have a genuine install/report
+      // from before the eviction happened.
+      if (inst && inst.reportType) {
+        const style = inst.screenshotUrl ? 'cursor:pointer;' : '';
+        // Screenshots for broken-app reports are only ever uploaded in Phase 0.
+        // If the tester later retries in a subsequent phase, createdAt/
+        // playStoreOpenedAt get updated on this same doc but no new screenshot
+        // is taken — so the image is always from Phase 0, even though the date
+        // shown reflects the most recent attempt, not the screenshot itself.
+        const lastAttemptDate = inst.createdAt ? ts(inst.createdAt) : (inst.playStoreOpenedAt ? ts(inst.playStoreOpenedAt) : null);
+        const reportCaption = `Reported ${inst.reportType}${lastAttemptDate ? ' — last attempt ' + lastAttemptDate : ''}\nScreenshot is from the initial Phase 0 attempt (exact date not recorded)`;
+        const click = inst.screenshotUrl ? `onclick="openScreenshot('${inst.screenshotUrl}', '${reportCaption.replace(/'/g, "\\'").replace(/\n/g, '\\n')}')"` : '';
+        const tip = inst.reportType + (inst.reportComment ? ': ' + inst.reportComment : '') + (inst.screenshotUrl ? ' (click for screenshot)' : '');
+        if (!evicted && !ownerEvicted) installsExpected++;
+        return `<td style="text-align:center;vertical-align:middle;${style}" title="${tip}" ${click}>🔴</td>`;
+      }
+      if (inst && inst.status === 'installed') {
+        if (!evicted && !ownerEvicted) { installsExpected++; installsDone++; }
+        const style = inst.screenshotUrl ? 'cursor:pointer;' : '';
+        const installCaption = `Installed${inst.installedAt ? ' — ' + ts(inst.installedAt) : ''}`;
+        const click = inst.screenshotUrl ? `onclick="openScreenshot('${inst.screenshotUrl}', '${installCaption.replace(/'/g, "\\'")}')"` : '';
+        const tip = inst.screenshotUrl ? 'Click to view install screenshot' : 'Installed';
+        return `<td style="text-align:center;vertical-align:middle;${style}" title="${tip}" ${click}>✅</td>`;
+      }
+
+      // No real data — now the eviction marker is meaningful: this task
+      // genuinely never happened and never will (tester or app owner gone).
+      if (evicted || ownerEvicted) {
+        return `<td style="background:#fef2f2;text-align:center;color:#fca5a5;" title="${evicted ? 'Tester' : 'App owner'} was evicted — task will never complete">✕</td>`;
+      }
+
+      installsExpected++;
+      if (!inst) return '<td style="text-align:center;color:#ccc;">?</td>';
+      return '<td style="text-align:center;color:#ccc;">⏳</td>';
+    }).join('');
+    return `<tr style="${evicted ? 'opacity:0.55;' : ''}"><td style="white-space:nowrap;font-size:12px;padding:6px 10px;font-weight:500;">${userApp?.appName || shortUid(uid)}${evicted ? ' <span class="tag-evicted">Evicted</span>' : ''}</td>${cells}</tr>`;
+  }).join('');
+
+  // Submissions by phase
+  const subsByPhase = {};
+  const subsSorted = [...subs].sort((a,b) => (b.submittedAt?.seconds||0) - (a.submittedAt?.seconds||0));
+  subsSorted.forEach(s => { const k = s.phase; if (!subsByPhase[k]) subsByPhase[k] = []; subsByPhase[k].push(s); });
+  const phaseKeys = Object.keys(subsByPhase).sort((a,b) => parseFloat(a) - parseFloat(b));
+  const subsHtml = phaseKeys.map(ph => {
+    const pSubs = subsByPhase[ph];
+    const phLabel = ph == 1.5 ? 'Quick Test A' : ph == 2.5 ? 'Quick Test B' : `Phase ${ph}`;
+    const rows = pSubs.map(s => {
+      const testerApp = Object.values(window._state.apps).find(a => a.ownerUid === s.testerUid && a.groupId === groupId);
+      const targetApp = window._state.apps[s.appId];
+      return `<tr>
+        <td style="font-size:12px;">${testerApp?.appName || shortUid(s.testerUid)}</td>
+        <td style="font-size:12px;">${targetApp?.appName || s.appId}</td>
+        <td style="font-size:12px;">${ts(s.submittedAt)}</td>
+        <td><button class="btn btn-ghost" style="font-size:11px;padding:2px 8px;" onclick="showSubmissionDetail('${s.id}')">View</button></td>
+      </tr>`;
+    }).join('');
+    return `<div style="margin-bottom:16px;"><div style="font-size:12px;font-weight:600;color:#555;margin-bottom:6px;">${phLabel} (${pSubs.length})</div>
+      <table class="members-table"><thead><tr><th>Tester</th><th>App reviewed</th><th>Submitted</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  }).join('');
+
+  // ownerAppMap needed by both the messages matrix and the review matrices below
+  const ownerAppMap = {};
+  apps.forEach(a => { ownerAppMap[a.ownerUid] = a; });
+
+  // Build per-pair message counts for this group. conversationId format is
+  // `${sortedUids[0]}_${sortedUids[1]}_${groupId}` (see sendMessage in index.ts),
+  // but simplest/most robust to just filter messages by groupId directly.
+  const groupMessages = window._state.messages.filter(m => m.groupId === groupId);
+  const messagesByPair = {}; // key: "uidA|uidB" (sorted) -> [messages]
+  groupMessages.forEach(m => {
+    const pair = [m.senderUid, m.recipientUid].sort();
+    const key = pair.join('|');
+    if (!messagesByPair[key]) messagesByPair[key] = [];
+    messagesByPair[key].push(m);
+  });
+
+  const messagesMatrixMembers = members.filter(uid => ownerAppMap[uid]);
+  let totalConversations = 0;
+  const messagesHeaders = messagesMatrixMembers.map(uid => {
+    const a = ownerAppMap[uid];
+    const evicted = isEvicted(uid);
+    return `<th style="font-size:11px;padding:6px 10px;white-space:nowrap;${evicted ? 'color:#dc2626;' : ''}">${a?.appName || shortUid(uid)}${evicted ? ' 🚫' : ''}</th>`;
+  }).join('');
+
+  const messagesRows = messagesMatrixMembers.map(uidA => {
+    const appA = ownerAppMap[uidA];
+    const evictedA = isEvicted(uidA);
+    const cells = messagesMatrixMembers.map(uidB => {
+      if (uidA === uidB) return '<td style="background:#f5f5f5;text-align:center;color:#ccc;">—</td>';
+      const pairKey = [uidA, uidB].sort().join('|');
+      const msgs = messagesByPair[pairKey] || [];
+      if (msgs.length === 0) return '<td style="text-align:center;color:#ccc;">·</td>';
+      // Only count each pair once (avoid double-count when iterating both directions)
+      if (uidA < uidB) totalConversations++;
+      return `<td style="text-align:center;vertical-align:middle;cursor:pointer;font-weight:600;color:#4a6cf7;" title="${msgs.length} message${msgs.length !== 1 ? 's' : ''} — click to view" onclick="showConversation('${groupId}','${uidA}','${uidB}')">💬 ${msgs.length}</td>`;
+    }).join('');
+    return `<tr style="${evictedA ? 'opacity:0.55;' : ''}"><td style="white-space:nowrap;font-size:12px;padding:6px 10px;font-weight:500;">${appA?.appName || shortUid(uidA)}${evictedA ? ' <span class="tag-evicted">Evicted</span>' : ''}</td>${cells}</tr>`;
+  }).join('');
+
+  // Build per-phase review matrices (only full review phases: 1, 2, 3)
+  const reviewPhases = [1, 1.5, 2, 2.5, 3]; // includes Quick Tests A and B
+
+  const phaseMatricesHtml = reviewPhases.map(ph => {
+    const pSubs = subs.filter(s => s.phase === ph);
+    if (pSubs.length === 0 && g.currentPhase < ph) return '';
+
+    // Include ALL members who own an app (active or evicted) — don't let
+    // eviction silently hide tasks that will never be completed.
+    const matrixMembers = members.filter(uid => ownerAppMap[uid]);
+    const phHeaders = matrixMembers.map(uid => {
+      const a = ownerAppMap[uid];
+      const evicted = isEvicted(uid);
+      return `<th style="font-size:11px;padding:6px 10px;white-space:nowrap;${evicted ? 'color:#dc2626;' : ''}">${a?.appName || shortUid(uid)}${evicted ? ' 🚫' : ''}</th>`;
+    }).join('');
+
+    const phRows = matrixMembers.map(reviewerUid => {
+      const reviewerApp = ownerAppMap[reviewerUid];
+      const reviewerEvicted = isEvicted(reviewerUid);
+      const cells = matrixMembers.map(ownerUid => {
+        if (ownerUid === reviewerUid) return '<td style="background:#f5f5f5;text-align:center;color:#ccc;">—</td>';
+        const ownerEvicted = isEvicted(ownerUid);
+        // Check mutual match — only show cell if they are matched
+        const reviewerMatches = g.mutualMatches?.[reviewerUid] || [];
+        if (!reviewerMatches.includes(ownerUid)) {
+          return '<td style="background:#fafafa;text-align:center;color:#ddd;" title="No mutual match">×</td>';
+        }
+        const ownerApp = ownerAppMap[ownerUid];
+        const sub = pSubs.find(s => s.testerUid === reviewerUid && s.appId === ownerApp?.appId);
+        if (sub) {
+          const isAdminSkip = (sub.testingObstaclesComment || '').startsWith('[admin]');
+          if (isAdminSkip) {
+            return `<td style="text-align:center;vertical-align:middle;cursor:pointer;" title="Admin-approved skip (no mutual install / partner didn't test) — click to view" onclick="showSubmissionDetail('${sub.id}')">🟢</td>`;
+          }
+          return `<td style="text-align:center;vertical-align:middle;cursor:pointer;" title="Submitted ${ts(sub.submittedAt)} — click to view" onclick="showSubmissionDetail('${sub.id}')">✅</td>`;
+        }
+        if (reviewerEvicted || ownerEvicted) {
+          return '<td style="background:#fef2f2;text-align:center;color:#fca5a5;" title="Tester was evicted — task will never complete">✕</td>';
+        }
+        return '<td style="text-align:center;color:#ccc;" title="Not submitted yet">⏳</td>';
+      }).join('');
+      return `<tr style="${reviewerEvicted ? 'opacity:0.55;' : ''}"><td style="white-space:nowrap;font-size:12px;padding:6px 10px;font-weight:500;">${reviewerApp?.appName || shortUid(reviewerUid)}${reviewerEvicted ? ' <span class="tag-evicted">Evicted</span>' : ''}</td>${cells}</tr>`;
+    }).join('');
+
+    const submitted = pSubs.length;
+    const adminSkips = pSubs.filter(s => (s.testingObstaclesComment || '').startsWith('[admin]')).length;
+    // Expected = sum of mutual match counts across ALL members (active + evicted),
+    // so the denominator reflects tasks that were actually assigned, not just
+    // the ones still theoretically completable.
+    const expected = matrixMembers.reduce((acc, uid) => acc + (g.mutualMatches?.[uid]?.length || 0), 0);
+    const pctDone = expected > 0 ? Math.round((submitted / expected) * 100) : 0;
+    const phLabel = ph === 1.5 ? 'Quick Test A' : ph === 2.5 ? 'Quick Test B' : `Phase ${ph}`;
+    const phColor = ph === 1 ? '#0ea5e9' : ph === 1.5 ? '#38bdf8' : ph === 2 ? '#8b5cf6' : ph === 2.5 ? '#a78bfa' : '#10b981';
+
+    return `<div style="margin-bottom:20px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <span style="font-size:12px;font-weight:600;color:#555;">${phLabel}</span>
+        <span style="font-size:11px;color:#888;">${submitted} / ${expected} reviews submitted${adminSkips > 0 ? ` (${adminSkips} 🟢 admin skip${adminSkips !== 1 ? 's' : ''})` : ''}</span>
+        <div style="flex:1;height:4px;background:#e8e8e8;border-radius:2px;overflow:hidden;max-width:120px;">
+          <div style="width:${pctDone}%;height:100%;background:${phColor};border-radius:2px;"></div>
+        </div>
+        <span style="font-size:11px;color:#888;">${pctDone}%</span>
+      </div>
+      <div style="background:#fff;border-radius:10px;border:1px solid #e8e8e8;overflow:auto;">
+        <table class="members-table">
+          <thead><tr><th>Reviewer ↓ / App →</th>${phHeaders}</tr></thead>
+          <tbody>${phRows || '<tr><td colspan="99" style="text-align:center;color:#aaa;padding:12px;">No members</td></tr>'}</tbody>
+        </table>
+        <div style="padding:6px 16px;font-size:11px;color:#aaa;">✅ submitted (click to view) &nbsp; 🟢 admin-approved skip &nbsp; ⏳ pending &nbsp; × no mutual match &nbsp; ✕ evicted (never completing) &nbsp; — own app</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="page-header">
+      <div><h2>Group #${g.groupNumber}</h2>
+        <div class="subtitle">${phaseLabelShort(g)} · ${activeMemberSet.size}/${members.length} members active · ${installs.length} installs · ${subs.length} submissions</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">${phaseBadge(g)} ${deadlineHtml(groupDeadline(g))}</div>
+    </div>
+    ${phaseProgress(g)}
+    <div style="padding:16px 24px 0;">
+      <div class="section-title" style="margin-bottom:10px;">Members & inactivity <span style="font-weight:400;color:#888;font-size:11px;">(${activeMemberSet.size} active, ${members.length - activeMemberSet.size} evicted)</span></div>
+      <table class="members-table" style="background:#fff;border-radius:10px;border:1px solid #e8e8e8;margin-bottom:20px;">
+        <thead><tr><th>User</th><th>App</th><th>App ID</th><th>Status</th><th>Inactivity (6d max)</th><th>Last active</th></tr></thead>
+        <tbody>${members.map(uid => {
+          const app = apps.find(a => a.ownerUid === uid);
+          const evicted = isEvicted(uid);
+          const lastAct = g.lastActivityAt?.[uid];
+          const daysInactive = lastAct ? (Date.now() - lastAct.seconds * 1000) / 86400000 : null;
+          const inactPct = daysInactive !== null ? Math.min(100, (daysInactive / INACTIVITY_EVICTION_DAYS) * 100) : 0;
+          const inactClass = inactPct > 80 ? 'fill-danger' : inactPct > 50 ? 'fill-warn' : 'fill-safe';
+          return `<tr style="${evicted ? 'opacity:0.55;' : ''}">
+            <td><span class="uid-chip" onclick="showUserDetail('${uid}','${g.groupId}')" title="Click to view user details">${shortUid(uid)}</span></td>
+            <td>${app ? `${app.iconUrl ? `<img src="${app.iconUrl}" style="width:22px;height:22px;border-radius:5px;object-fit:cover;vertical-align:middle;margin-right:6px;">` : ''}${app.packageName ? `<a href="${playStoreUrl(app.packageName)}" target="_blank" rel="noopener" style="color:#1a1a1a;text-decoration:none;" title="Open on Play Store" onclick="event.stopPropagation()"><strong>${app.appName}</strong></a>` : `<strong>${app.appName}</strong>`}` : '—'}</td>
+            <td>${app ? `<span class="uid-chip" onclick="copyToClipboard('${app.appId}')" title="Click to copy App ID">${shortUid(app.appId)}</span>` : '—'}</td>
+            <td>${evicted ? '<span class="tag-evicted">Evicted</span>' : '<span class="tag-active-member">Active</span>'}</td>
+            <td>${evicted ? '<span style="font-size:11px;color:#ccc;">—</span>' : `<div class="inactivity-bar"><div class="inactivity-track"><div class="inactivity-fill ${inactClass}" style="width:${inactPct.toFixed(0)}%"></div></div><span style="font-size:11px;color:#888;">${daysInactive !== null ? daysInactive.toFixed(1)+'d' : '—'}</span></div>`}</td>
+            <td style="font-size:12px;color:#888;">${lastAct ? ts(lastAct) : '—'}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>
+
+      ${apps.length > 0 ? `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span class="section-title" style="margin-bottom:0;">Install matrix</span>
+        <span style="font-size:11px;color:#888;">${installsDone} / ${installsExpected} installed</span>
+        <div style="flex:1;height:4px;background:#e8e8e8;border-radius:2px;overflow:hidden;max-width:120px;">
+          <div style="width:${installsExpected > 0 ? Math.round((installsDone/installsExpected)*100) : 0}%;height:100%;background:#0ea5e9;border-radius:2px;"></div>
+        </div>
+        <span style="font-size:11px;color:#888;">${installsExpected > 0 ? Math.round((installsDone/installsExpected)*100) : 0}%</span>
+      </div>
+      <div style="background:#fff;border-radius:10px;border:1px solid #e8e8e8;overflow:auto;margin-bottom:20px;">
+        <table class="members-table"><thead><tr><th>Tester ↓ / App →</th>${matrixHeaders}</tr></thead><tbody>${matrixRows}</tbody></table>
+        <div style="padding:8px 16px;font-size:11px;color:#aaa;">✅ installed &nbsp; 🔴 problem (hover for detail) &nbsp; ⏳ pending &nbsp; ✕ evicted (never completing) &nbsp; — own app</div>
+      </div>` : ''}
+
+      ${problems.length > 0 ? `
+      <div style="margin-bottom:20px;">
+        <div class="section-title" style="cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:0;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.prob-icon').textContent=this.nextElementSibling.style.display==='none'?'▶':'▼';">
+          <span style="color:#dc2626;">🔴 Problems (${problems.length})</span>
+          <span class="prob-icon" style="font-size:10px;color:#aaa;">▶</span>
+        </div>
+        <div style="display:none;margin-top:10px;">
+          <div class="feedback-list">
+            ${problems.map(p => {
+              const testerApp = Object.values(window._state.apps).find(a => a.ownerUid === p.testerUid);
+              const targetApp = window._state.apps[p.appId];
+              return `<div class="problem-card">
+                <div class="pc-header"><span class="pc-type">${p.reportType}</span><span class="pc-app">${targetApp?.appName || p.appId}</span><span class="pc-tester">by ${testerApp?.appName || shortUid(p.testerUid)}</span></div>
+                ${p.reportComment ? `<div class="pc-comment">"${p.reportComment}"</div>` : ''}
+                ${p.screenshotUrl ? `<div class="screenshot-thumb" style="margin-top:8px;"><img src="${p.screenshotUrl}" alt="Screenshot" onclick="openScreenshot('${p.screenshotUrl}')" title="Click to enlarge"></div>` : ''}
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>` : ''}
+
+      <div class="section-title" style="margin-bottom:10px;">Review matrices</div>
+      ${phaseMatricesHtml}
+
+      ${messagesMatrixMembers.length > 1 ? `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span class="section-title" style="margin-bottom:0;">Messages</span>
+        <span style="font-size:11px;color:#888;">${totalConversations} conversation${totalConversations !== 1 ? 's' : ''} · ${groupMessages.length} message${groupMessages.length !== 1 ? 's' : ''} total</span>
+      </div>
+      <div style="background:#fff;border-radius:10px;border:1px solid #e8e8e8;overflow:auto;margin-bottom:20px;">
+        <table class="members-table"><thead><tr><th>Tester ↓ / Tester →</th>${messagesHeaders}</tr></thead><tbody>${messagesRows}</tbody></table>
+        <div style="padding:8px 16px;font-size:11px;color:#aaa;">💬 N messages exchanged (click to view conversation) &nbsp; · no messages &nbsp; — same person</div>
+      </div>` : ''}
+
+      <div class="section-title" style="margin-bottom:10px;margin-top:4px;">Submissions list</div>
+      ${subsHtml || '<div class="empty">No submissions yet</div>'}
+    </div>`;
+}
+
+// ── Feedback ───────────────────────────────────────────────────────────────
+function renderFeedback() {
+  const s = window._state;
+  const subs = [...s.submissions].sort((a,b) => (b.submittedAt?.seconds||0) - (a.submittedAt?.seconds||0));
+  let html = `<div class="page-header"><div><h2>All feedback</h2><div class="subtitle">${subs.length} submissions total</div></div></div>
+    <div class="filter-row">
+      ${['all','1','1.5','2','2.5','3'].map(f => {
+        const label = f==='all'?'All phases':f==='1.5'?'Quick Test A':f==='2.5'?'Quick Test B':`Phase ${f}`;
+        return `<button class="filter-btn ${s.groupFilter===f?'active':''}" onclick="setFeedbackFilter('${f}')">${label}</button>`;
+      }).join('')}
+    </div><div class="section"><div class="feedback-list">`;
+
+  const filtered = s.groupFilter === 'all' ? subs : subs.filter(sub2 => parseFloat(sub2.phase) === parseFloat(s.groupFilter));
+  if (filtered.length === 0) html += '<div class="empty">No submissions</div>';
+  filtered.forEach(sub => {
+    const tApp = Object.values(s.apps).find(a => a.ownerUid === sub.testerUid);
+    const targetApp = s.apps[sub.appId];
+    const phLabel = sub.phase == 1.5 ? 'Quick Test A' : sub.phase == 2.5 ? 'Quick Test B' : `Phase ${sub.phase}`;
+    const phClass = sub.phase <= 1 ? 'fc-p1' : sub.phase <= 2 ? 'fc-p2' : 'fc-p3';
+    const isAdminSkip = (sub.testingObstaclesComment || '').startsWith('[admin]');
+    const obstacles = Array.isArray(sub.testingObstacles) ? sub.testingObstacles.filter(Boolean) : [];
+    const fields = [
+      ['firstImpressions','First impressions'],['bugsAndCrashes','Bugs & crashes'],
+      ['initialSuggestions','Suggestions'],['coreFeatureFeedback','Core features'],
+      ['bugsAndPerformance','Performance'],['improvementSuggestions','Improvements'],
+      ['whatYouLikedBest','Liked best'],['polishingNotes','Polish notes'],['playStoreReview','Play Store review'],
+      ['testingObstaclesComment','Testing obstacles (comment)'],
+    ].filter(([k]) => sub[k]);
+    html += `<div class="feedback-card">
+      <div class="fc-header">
+        <span class="fc-phase ${phClass}">${phLabel}</span>
+        ${isAdminSkip ? '<span class="badge" style="background:#d1fae5;color:#065f46;">🟢 Admin skip</span>' : ''}
+        <span class="fc-app">${targetApp?.appName || sub.appId}</span>
+        <span class="fc-tester">${tApp?.appName || shortUid(sub.testerUid)} · ${ts(sub.submittedAt)}</span>
+        <button class="btn btn-ghost" style="font-size:11px;padding:2px 8px;margin-left:auto;" onclick="showSubmissionDetail('${sub.id}')">Full</button>
+      </div>
+      ${obstacles.length > 0 ? `<div class="fc-field"><div class="fc-label">Obstacles reported</div><div class="fc-text">${obstacles.map(o => `<span class="badge badge-alert" style="margin-right:4px;">${o}</span>`).join('')}</div></div>` : ''}
+      ${fields.slice(0,2).map(([k,label]) => `<div class="fc-field"><div class="fc-label">${label}</div><div class="fc-text">${sub[k]}</div></div>`).join('')}
+      ${fields.length > 2 ? `<div style="font-size:11px;color:#aaa;margin-top:6px;">+${fields.length-2} more fields</div>` : ''}
+      ${obstacles.length === 0 && fields.length === 0 ? `<div style="font-size:11px;color:#aaa;margin-top:6px;">${(sub.phase == 1.5 || sub.phase == 2.5) ? '✓ Quick Test check-in — no written feedback collected at this step.' : 'No written feedback for this submission.'}</div>` : ''}
+    </div>`;
+  });
+  html += '</div></div>';
+  document.getElementById('view-feedback').innerHTML = html;
+}
+
+window.setFeedbackFilter = function(f) { window._state.groupFilter = f; renderFeedback(); };
+
+// ── Problems ───────────────────────────────────────────────────────────────
+function renderProblems() {
+  const problems = [...window._state.installations.filter(i => i.reportType)].sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
+  let html = `<div class="page-header"><div><h2>Problems</h2><div class="subtitle">${problems.length} open broken-app reports</div></div></div>
+    <div class="section"><div class="feedback-list">`;
+  if (problems.length === 0) html += '<div class="empty">No problems reported 🎉</div>';
+  problems.forEach(p => {
+    const targetApp = window._state.apps[p.appId];
+    const testerApp = Object.values(window._state.apps).find(a => a.ownerUid === p.testerUid);
+    const g = window._state.groups.find(g => g.groupId === p.groupId);
+    html += `<div class="problem-card">
+      <div class="pc-header"><span class="pc-type">${p.reportType}</span><span class="pc-app">${targetApp?.appName || p.appId}</span><span class="pc-tester">by ${testerApp?.appName || shortUid(p.testerUid)}</span></div>
+      <div style="font-size:11px;color:#aaa;margin-top:4px;">Group #${g?.groupNumber || p.groupId} · ${ts(p.createdAt)}</div>
+      ${p.reportComment ? `<div class="pc-comment" style="margin-top:6px;">"${p.reportComment}"</div>` : ''}
+      ${p.screenshotUrl ? `<div class="screenshot-thumb" style="margin-top:8px;"><img src="${p.screenshotUrl}" alt="Screenshot" onclick="openScreenshot('${p.screenshotUrl}')" title="Click to enlarge"></div>` : ''}
+    </div>`;
+  });
+  html += '</div></div>';
+  document.getElementById('view-problems').innerHTML = html;
+}
+
+// ── Summaries ──────────────────────────────────────────────────────────────
+function renderSummaries() {
+  const summs = [...window._state.summaries].sort((a,b) => (b.createdAt?.seconds||0) - (a.createdAt?.seconds||0));
+  let html = `<div class="page-header"><div><h2>AI summaries</h2><div class="subtitle">${summs.length} total</div></div></div>
+    <div class="section"><div class="feedback-list">`;
+  if (summs.length === 0) html += '<div class="empty">No summaries yet</div>';
+  summs.forEach(s => {
+    const app = window._state.apps[s.appId];
+    const phClass = s.status === 'success' ? 'fc-p3' : s.status === 'failed' ? 'badge-alert' : 'badge-forming';
+    html += `<div class="feedback-card">
+      <div class="fc-header"><span class="fc-phase ${phClass}">${s.status}</span><span class="fc-app">${app?.appName || s.appId}</span><span class="fc-tester">${ts(s.generatedAt || s.createdAt)}</span></div>
+      ${s.positiveSummary ? `<div class="fc-field"><div class="fc-label">✅ Positives</div><div class="fc-text">${s.positiveSummary}</div></div>` : ''}
+      ${s.improvementSummary ? `<div class="fc-field"><div class="fc-label">💡 Improvements</div><div class="fc-text">${s.improvementSummary}</div></div>` : ''}
+    </div>`;
+  });
+  html += '</div></div>';
+  document.getElementById('view-summaries').innerHTML = html;
+}
+
+// ── Old Groups ─────────────────────────────────────────────────────────────
+function renderOldGroups() {
+  const s = window._state;
+  const oldGroups = [...s.groups.filter(g => g.status === 'completed')]
+    .sort((a, b) => (b.groupNumber || 0) - (a.groupNumber || 0));
+
+  let html = `<div class="page-header">
+      <div><h2>Old Groups</h2><div class="subtitle">${oldGroups.length} completed testing cycle${oldGroups.length !== 1 ? 's' : ''}</div></div>
+    </div>
+    <div class="section"><div class="groups-grid">`;
+
+  if (oldGroups.length === 0) html += '<div class="empty">No completed groups yet</div>';
+  oldGroups.forEach(g => { html += oldGroupCardHtml(g); });
+
+  html += '</div></div>';
+  document.getElementById('view-oldgroups').innerHTML = html;
+}
+
+// Total cycle length from Phase 1 start to Phase 3 review deadline.
+// Mirrors PHASE_1_DURATION_DAYS + CHECKIN_A_DURATION_DAYS + PHASE_2_DURATION_DAYS
+// + CHECKIN_B_DURATION_DAYS + PHASE_3_DURATION_DAYS from constants.ts (3+2+3+2+3).
+// Update this if those constants change.
+const CYCLE_TOTAL_DAYS = 13;
+
+function oldGroupEndDate(group) {
+  // Cycle start = timerStartedAt (Phase 0B lock / handshake = start of Phase 1)
+  if (!group.timerStartedAt) return null;
+  const startMs = group.timerStartedAt.seconds * 1000;
+  const endMs = startMs + CYCLE_TOTAL_DAYS * 24 * 60 * 60 * 1000;
+  return { seconds: Math.floor(endMs / 1000) };
+}
+
+function oldGroupCardHtml(g) {
+  const totalMembers = g.memberUids?.length || 0;
+  const survivedMembers = g.activeMemberUids?.length || 0;
+  const evictedCount = totalMembers - survivedMembers;
+  const endDate = oldGroupEndDate(g);
+  const isExpanded = window._state.expandedOldGroups.has(g.groupId);
+
+  return `<div class="group-card">
+    <div class="group-card-header" onclick="toggleOldGroup('${g.groupId}')">
+      <div class="group-number">${g.groupNumber}</div>
+      <div class="group-info">
+        <h3>Group #${g.groupNumber}</h3>
+        <div class="meta">${totalMembers} total member${totalMembers !== 1 ? 's' : ''}${evictedCount > 0 ? ` · ${evictedCount} evicted along the way` : ''} · Started ${ts(g.createdAt)}</div>
+      </div>
+      <div class="group-badges">
+        <span class="badge badge-completed">Completed</span>
+        <span class="collapse-icon ${isExpanded ? 'open' : ''}" id="icon-old-${g.groupId}">▼</span>
+      </div>
+    </div>
+    <div style="padding:10px 16px;display:flex;gap:20px;align-items:center;border-bottom:1px solid #f0f0f0;font-size:12px;color:#888;">
+      <span>Start: <strong style="color:#333;">${ts(g.createdAt)}</strong></span>
+      <span>Phase 1 start: <strong style="color:#333;">${g.timerStartedAt ? ts(g.timerStartedAt) : '—'}</strong></span>
+      <span>Cycle end: <strong style="color:#333;">${endDate ? ts(endDate) : '—'}</strong></span>
+      <span style="margin-left:auto;">${survivedMembers}/${totalMembers} completed the full cycle</span>
+    </div>
+    <div class="group-body ${isExpanded ? 'open' : ''}" id="old-body-${g.groupId}">
+      ${isExpanded ? oldGroupBodyHtml(g) : ''}
+    </div>
+  </div>`;
+}
+
+window.toggleOldGroup = function(groupId) {
+  const body = document.getElementById('old-body-' + groupId);
+  const icon = document.getElementById('icon-old-' + groupId);
+  if (!body) return;
+  const isOpen = window._state.expandedOldGroups.has(groupId);
+  if (isOpen) {
+    window._state.expandedOldGroups.delete(groupId);
+    body.classList.remove('open');
+    body.innerHTML = '';
+  } else {
+    window._state.expandedOldGroups.add(groupId);
+    const g = window._state.groups.find(g => g.groupId === groupId);
+    if (g) body.innerHTML = oldGroupBodyHtml(g);
+    body.classList.add('open');
+  }
+  if (icon) icon.classList.toggle('open', !isOpen);
+};
+
+function oldGroupBodyHtml(g) {
+  const apps = (g.appIds || []).map(id => window._state.apps[id]).filter(Boolean);
+  const evictedUids = (g.memberUids || []).filter(uid => !(g.activeMemberUids || []).includes(uid));
+
+  const rows = apps.map(app => {
+    const wasEvicted = evictedUids.includes(app.ownerUid);
+    return `<tr>
+      <td>${app.iconUrl ? `<img src="${app.iconUrl}" style="width:24px;height:24px;border-radius:5px;object-fit:cover;vertical-align:middle;margin-right:6px;">` : ''}<strong>${app.appName || app.packageName}</strong></td>
+      <td style="font-size:12px;color:#888;">${app.packageName}</td>
+      <td><span class="uid-chip" onclick="copyToClipboard('${app.ownerUid}')">${shortUid(app.ownerUid)}</span></td>
+      <td>${wasEvicted ? '<span class="tag-evicted">Evicted</span>' : '<span class="tag-active-member">Completed</span>'}</td>
+      <td style="text-align:right;"><button class="btn btn-ghost" style="font-size:11px;padding:3px 8px;" onclick="showUserDetail('${app.ownerUid}','${g.groupId}')">View</button></td>
+    </tr>`;
+  }).join('');
+
+  return `<table class="members-table">
+    <thead><tr><th>App</th><th>Package</th><th>Owner</th><th>Status</th><th></th></tr></thead>
+    <tbody>${rows || '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:16px;">No apps found</td></tr>'}</tbody>
+  </table>`;
+}
+
+// ── Single Tests ───────────────────────────────────────────────────────────
+function boostBadge(app) {
+  const t = Number(app.boostTier) || 0;
+  if (t >= 3) return '<span class="badge" style="background:#fde68a;color:#92400e;">⭐ Boost L2</span>';
+  if (t === 2) return '<span class="badge" style="background:#fde68a;color:#92400e;">⭐ Boost L2</span>';
+  if (t === 1) return '<span class="badge" style="background:#fef3c7;color:#a16207;">✨ Boost L1</span>';
+  return '<span class="badge badge-gray">Normal</span>';
+}
+
+function boostExpiryBar(app) {
+  const t = Number(app.boostTier) || 0;
+  if (t === 0 || !app.boostExpiresAt) return '';
+
+  const expiresMs = app.boostExpiresAt.seconds * 1000;
+  const submittedMs = app.submittedAt?.seconds ? app.submittedAt.seconds * 1000 : null;
+  const nowMs = Date.now();
+
+  const remainingMs = expiresMs - nowMs;
+  const remainingH = remainingMs / 3600000;
+
+  if (remainingMs <= 0) {
+    return `<div style="padding:8px 16px;border-bottom:1px solid #f0f0f0;">
+      <div style="font-size:11px;color:#dc2626;font-weight:600;">⏱ Boost expired</div>
+    </div>`;
+  }
+
+  // Total duration: prefer submittedAt→expiresAt span if available (covers
+  // both submission-time boosts and later purchases), fall back to just
+  // showing remaining time without a bar if we can't compute a span.
+  const totalMs = submittedMs ? (expiresMs - submittedMs) : null;
+  const pct = totalMs && totalMs > 0 ? Math.max(0, Math.min(100, ((totalMs - remainingMs) / totalMs) * 100)) : null;
+
+  const remainingLabel = remainingH < 24 ? `${remainingH.toFixed(0)}h left` : `${(remainingH/24).toFixed(1)}d left`;
+  const barColor = remainingH < 24 ? '#dc2626' : remainingH < 72 ? '#d97706' : '#22a06b';
+
+  return `<div style="padding:8px 16px;border-bottom:1px solid #f0f0f0;">
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:#888;margin-bottom:3px;">
+      <span>Boost active</span><span>${remainingLabel}</span>
+    </div>
+    ${pct !== null ? `<div class="progress-track"><div class="progress-fill" style="width:${pct}%;background:${barColor};"></div></div>` : ''}
+  </div>`;
+}
+
+function renderSingleTests() {
+  const s = window._state;
+  const apps = [...s.singleTestApps];
+
+  // Sort: boostTier desc (2, 1, 0), then submittedAt desc within each tier
+  // Legacy boostTier 3 (removed from the product, see constants.ts) is
+  // treated as equivalent to today's tier 2 for display purposes.
+  const tierOf = (a) => {
+    const t = Number(a.boostTier) || 0;
+    return t >= 3 ? 2 : t;
+  };
+  apps.sort((a, b) => {
+    const tierDiff = tierOf(b) - tierOf(a);
+    if (tierDiff !== 0) return tierDiff;
+    return (b.submittedAt?.seconds || 0) - (a.submittedAt?.seconds || 0);
+  });
+
+  const totalSuccess = s.singleTestSubmissions.filter(sub => sub.submissionType === 'success').length;
+  const totalFailed = s.singleTestSubmissions.filter(sub => sub.submissionType === 'failed').length;
+  const hiddenCount = apps.filter(a => a.hiddenAt).length;
+
+  let html = `<div class="page-header">
+      <div><h2>Single Tests</h2><div class="subtitle">${apps.length} apps · ${totalSuccess} successful tests · ${totalFailed} failed reports${hiddenCount ? ` · ${hiddenCount} hidden` : ''}</div></div>
+    </div>
+    <div class="section"><div class="groups-grid">`;
+
+  if (apps.length === 0) html += '<div class="empty">No single test apps yet</div>';
+
+  let lastTier = undefined;
+  apps.forEach(app => {
+    const tier = tierOf(app);
+    if (tier !== lastTier) {
+      const tierLabel = tier === 2 ? '⭐ Boost Level 2' : tier === 1 ? '✨ Boost Level 1' : 'Normal (no boost)';
+      html += `<div class="section-title" style="margin-top:${lastTier === undefined ? '0' : '8px'};">${tierLabel}</div>`;
+      lastTier = tier;
+    }
+    html += singleTestAppCardHtml(app);
+  });
+
+  html += '</div></div>';
+  document.getElementById('view-singletests').innerHTML = html;
+}
+
+function singleTestAppCardHtml(app) {
+  const appSubs = window._state.singleTestSubmissions.filter(sub => sub.singleTestAppId === app.id);
+  const successSubs = appSubs.filter(sub => sub.submissionType === 'success').sort((a,b) => (b.submittedAt?.seconds||0) - (a.submittedAt?.seconds||0));
+  const failedSubs = appSubs.filter(sub => sub.submissionType === 'failed').sort((a,b) => (b.submittedAt?.seconds||0) - (a.submittedAt?.seconds||0));
+  const isExpanded = window._state.expandedSingleTestApps.has(app.id);
+
+  return `<div class="group-card" style="${app.hiddenAt ? 'border-color:#fca5a5;' : ''}">
+    <div class="group-card-header" style="cursor:default;">
+      ${app.iconUrl ? `<img src="${app.iconUrl}" style="width:36px;height:36px;border-radius:8px;object-fit:cover;flex-shrink:0;" alt="">` : '<div class="group-number">?</div>'}
+      <div class="group-info">
+        <h3>${app.appName || app.packageName}</h3>
+        <div class="meta">${app.packageName} · Submitted ${ts(app.submittedAt)}</div>
+      </div>
+      <div class="group-badges">
+        ${boostBadge(app)}
+        ${app.hiddenAt ? '<span class="badge badge-alert">Hidden</span>' : ''}
+      </div>
+    </div>
+    ${boostExpiryBar(app)}
+    <div style="padding:10px 16px;display:flex;gap:16px;align-items:center;border-bottom:1px solid #f0f0f0;">
+      <span class="uid-chip" style="background:#d1fae5;color:#065f46;cursor:pointer;" onclick="toggleSingleTestRow('${app.id}','success')">
+        ✅ ${successSubs.length} successful
+      </span>
+      <span class="uid-chip" style="background:#fee2e2;color:#991b1b;cursor:pointer;" onclick="toggleSingleTestRow('${app.id}','failed')">
+        🔴 ${failedSubs.length} failed
+      </span>
+      ${app.consecutiveFailedReports > 0 ? `<span style="font-size:11px;color:#d97706;">⚠ ${app.consecutiveFailedReports} consecutive fails</span>` : ''}
+      <span style="margin-left:auto;font-size:11px;color:#aaa;">Reward: ${app.creditRewardPerTest ?? '—'} credits/test</span>
+    </div>
+    <div class="group-body ${isExpanded ? 'open' : ''}" id="st-body-${app.id}">
+      ${isExpanded ? singleTestSubmissionsHtml(app.id) : ''}
+    </div>
+  </div>`;
+}
+
+window.toggleSingleTestRow = function(appId, type) {
+  const body = document.getElementById('st-body-' + appId);
+  if (!body) return;
+  const isOpen = window._state.expandedSingleTestApps.has(appId);
+  if (isOpen) {
+    window._state.expandedSingleTestApps.delete(appId);
+    body.classList.remove('open');
+    body.innerHTML = '';
+  } else {
+    window._state.expandedSingleTestApps.add(appId);
+    body.innerHTML = singleTestSubmissionsHtml(appId);
+    body.classList.add('open');
+  }
+};
+
+function singleTestSubmissionsHtml(appId) {
+  const appSubs = [...window._state.singleTestSubmissions.filter(sub => sub.singleTestAppId === appId)]
+    .sort((a,b) => (b.submittedAt?.seconds||0) - (a.submittedAt?.seconds||0));
+
+  if (appSubs.length === 0) return '<div class="empty">No submissions yet</div>';
+
+  const rows = appSubs.map(sub => {
+    const tester = window._state.users[sub.testerUid];
+    const testerLabel = tester?.displayName || tester?.email || shortUid(sub.testerUid);
+    const isSuccess = sub.submissionType === 'success';
+    const key = isSuccess
+      ? (sub.playStoreReviewLeft ? '⭐ Play Store review left' : '')
+      : (sub.failureReason || '');
+    return `<tr>
+      <td>${isSuccess ? '✅' : '🔴'}</td>
+      <td style="font-size:12px;">${testerLabel}</td>
+      <td style="font-size:12px;color:#888;">${ts(sub.submittedAt)}</td>
+      <td style="font-size:12px;">${key}</td>
+      <td style="font-size:12px;">+${sub.creditsAwarded ?? 0} cr</td>
+      <td><button class="btn btn-ghost" style="font-size:11px;padding:2px 8px;" onclick="showSingleTestSubmissionDetail('${sub.id}')">View</button></td>
+    </tr>`;
+  }).join('');
+
+  return `<table class="members-table">
+    <thead><tr><th></th><th>Tester</th><th>Date</th><th>Key info</th><th>Reward</th><th></th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+window.showSingleTestSubmissionDetail = function(subId) {
+  const sub = window._state.singleTestSubmissions.find(s => s.id === subId);
+  if (!sub) return;
+  const app = window._state.singleTestApps.find(a => a.id === sub.singleTestAppId);
+  const tester = window._state.users[sub.testerUid];
+  const testerLabel = tester?.displayName || tester?.email || shortUid(sub.testerUid);
+  const isSuccess = sub.submissionType === 'success';
+
+  let html = `<div class="detail-header"><h3>${isSuccess ? '✅ Successful test' : '🔴 Failed test'} — ${app?.appName || sub.singleTestAppId}</h3><button class="close-btn" onclick="closeDetail()">✕</button></div>
+  <div class="detail-body">
+    <div class="detail-section"><h4>Info</h4>
+      <div class="kv-row"><span class="k">Tester</span><span class="v">${testerLabel}</span></div>
+      <div class="kv-row"><span class="k">App</span><span class="v">${app?.appName || sub.singleTestAppId}</span></div>
+      <div class="kv-row"><span class="k">Submitted</span><span class="v">${ts(sub.submittedAt)}</span></div>
+      <div class="kv-row"><span class="k">Credits awarded</span><span class="v">+${sub.creditsAwarded ?? 0}</span></div>
+    </div>`;
+
+  if (isSuccess) {
+    html += `<div class="detail-section"><h4>Feedback</h4>
+      ${sub.reviewText ? `<div class="kv-row" style="flex-direction:column;align-items:flex-start;gap:4px;"><span class="k">Written feedback</span><span class="v" style="text-align:left;max-width:100%;font-weight:400;line-height:1.5;">${sub.reviewText}</span></div>` : ''}
+      ${sub.playStoreReview ? `<div class="kv-row" style="flex-direction:column;align-items:flex-start;gap:4px;"><span class="k">Play Store review</span><span class="v" style="text-align:left;max-width:100%;font-weight:400;line-height:1.5;">${sub.playStoreReview}</span></div>` : ''}
+      <div class="kv-row"><span class="k">Left a Play Store review</span><span class="v">${sub.playStoreReviewLeft ? 'Yes' : 'No'}</span></div>
+    </div>`;
+  } else {
+    html += `<div class="detail-section"><h4>Failure details</h4>
+      <div class="kv-row"><span class="k">Reason</span><span class="v">${sub.failureReason || '—'}</span></div>
+      ${sub.failureComment ? `<div class="kv-row" style="flex-direction:column;align-items:flex-start;gap:4px;"><span class="k">Comment</span><span class="v" style="text-align:left;max-width:100%;font-weight:400;line-height:1.5;">${sub.failureComment}</span></div>` : ''}
+    </div>`;
+  }
+
+  if (sub.screenshotUrl) {
+    html += `<div class="detail-section"><h4>Screenshot</h4>
+      <div class="screenshot-thumb"><img src="${sub.screenshotUrl}" alt="Screenshot" onclick="openScreenshot('${sub.screenshotUrl}')" title="Click to enlarge" style="width:100px;height:100px;"></div>
+    </div>`;
+  }
+
+  html += '</div>';
+  document.getElementById('detailPanel').innerHTML = html;
+  document.getElementById('detailOverlay').style.display = 'flex';
+};
+
+// ── Detail overlays ────────────────────────────────────────────────────────
+window.showSubmissionDetail = function(subId) {
+  const sub = window._state.submissions.find(s => s.id === subId);
+  if (!sub) return;
+  const targetApp = window._state.apps[sub.appId];
+  const tApp = Object.values(window._state.apps).find(a => a.ownerUid === sub.testerUid);
+  const phLabel = sub.phase == 1.5 ? 'Quick Test A' : sub.phase == 2.5 ? 'Quick Test B' : `Phase ${sub.phase}`;
+  const isAdminSkip = (sub.testingObstaclesComment || '').startsWith('[admin]');
+  const obstacles = Array.isArray(sub.testingObstacles) ? sub.testingObstacles.filter(Boolean) : [];
+  const fields = [
+    ['firstImpressions','First impressions'],['bugsAndCrashes','Bugs & crashes'],
+    ['initialSuggestions','Initial suggestions'],['coreFeatureFeedback','Core feature feedback'],
+    ['bugsAndPerformance','Bugs & performance'],['improvementSuggestions','Improvement suggestions'],
+    ['whatYouLikedBest','Liked best'],['polishingNotes','Polish notes'],['playStoreReview','Play Store review'],
+    ['testingObstaclesComment','Testing obstacles / skip reason (comment)'],
+  ];
+  const filledFields = fields.filter(([k]) => sub[k]);
+  let html = `<div class="detail-header"><h3>${isAdminSkip ? '🟢 ' : ''}${phLabel} — ${targetApp?.appName || sub.appId}</h3><button class="close-btn" onclick="closeDetail()">✕</button></div>
+  <div class="detail-body">
+    ${isAdminSkip ? `<div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:8px;padding:10px 12px;margin-bottom:16px;font-size:12px;color:#065f46;">🟢 Admin-approved skip — counted as a completed task (no mutual install, or partner didn't test back).</div>` : ''}
+    <div class="detail-section"><h4>Info</h4>
+      <div class="kv-row"><span class="k">Tester</span><span class="v">${tApp?.appName || shortUid(sub.testerUid)}</span></div>
+      <div class="kv-row"><span class="k">App reviewed</span><span class="v">${targetApp?.appName || sub.appId}</span></div>
+      <div class="kv-row"><span class="k">Phase</span><span class="v">${phLabel}</span></div>
+      <div class="kv-row"><span class="k">Submitted</span><span class="v">${ts(sub.submittedAt)}</span></div>
+      <div class="kv-row"><span class="k">Group</span><span class="v">${sub.groupId}</span></div>
+    </div>
+    ${obstacles.length > 0 ? `<div class="detail-section"><h4>Testing obstacles (selected)</h4>${obstacles.map(o => `<span class="badge badge-alert" style="margin-right:4px;margin-bottom:4px;display:inline-block;">${o}</span>`).join('')}</div>` : ''}
+    <div class="detail-section"><h4>Feedback</h4>
+      ${filledFields.map(([k,label]) => `<div class="kv-row" style="flex-direction:column;align-items:flex-start;gap:4px;"><span class="k">${label}</span><span class="v" style="text-align:left;max-width:100%;font-weight:400;line-height:1.5;">${sub[k]}</span></div>`).join('') || (obstacles.length > 0 ? '<div style="color:#aaa;font-size:13px;">No written comment — see obstacles above.</div>' : (sub.phase == 1.5 || sub.phase == 2.5) ? `<div style="color:#aaa;font-size:13px;">✓ Quick Test check-in — confirms the app is still installed and working. No written feedback is collected at this step.</div>` : '<div style="color:#aaa;font-size:13px;">No feedback fields</div>')}
+    </div>
+  </div>`;
+  document.getElementById('detailPanel').innerHTML = html;
+  document.getElementById('detailOverlay').style.display = 'flex';
+};
+
+window.showUserDetail = async function(uid, groupId) {
+  document.getElementById('detailPanel').innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
+  document.getElementById('detailOverlay').style.display = 'flex';
+  await Promise.all([ensureUsers(), ensureSubmissions(), ensureApps()]);
+
+  const user = window._state.users[uid];
+  const userApps = Object.values(window._state.apps).filter(a => a.ownerUid === uid);
+  const subs = window._state.submissions.filter(s => s.testerUid === uid && s.groupId === groupId);
+  let html = `<div class="detail-header"><h3>User ${shortUid(uid)}</h3><button class="close-btn" onclick="closeDetail()">✕</button></div>
+  <div class="detail-body">
+    <div class="detail-section"><h4>Profile</h4>
+      <div class="kv-row"><span class="k">UID</span><span class="v"><span class="uid-chip" onclick="copyToClipboard('${uid}')">${uid}</span></span></div>
+      ${user?.email ? `<div class="kv-row"><span class="k">Email</span><span class="v">${user.email}</span></div>` : ''}
+      ${user?.displayName ? `<div class="kv-row"><span class="k">Name</span><span class="v">${user.displayName}</span></div>` : ''}
+      <div class="kv-row"><span class="k">FCM token</span><span class="v">${user?.fcmToken ? '✅ set' : '❌ none'}</span></div>
+    </div>
+    <div class="detail-section"><h4>Apps</h4>
+      ${userApps.map(a => `<div class="kv-row"><span class="k">${a.appName}</span><span class="v badge ${a.status==='completed'?'badge-completed':a.status==='evicted'?'badge-alert':'badge-active'}">${a.status}</span></div>`).join('') || '<div style="color:#aaa;font-size:13px;">None</div>'}
+    </div>
+    <div class="detail-section"><h4>Submissions in this group (${subs.length})</h4>
+      ${subs.map(s => {
+        const phLabel = s.phase==1.5?'QT-A':s.phase==2.5?'QT-B':`P${s.phase}`;
+        const targetApp = window._state.apps[s.appId];
+        return `<div class="kv-row"><span class="k">${phLabel} → ${targetApp?.appName||s.appId}</span><span class="v" style="font-size:11px;font-weight:400;">${ts(s.submittedAt)}</span></div>`;
+      }).join('') || '<div style="color:#aaa;font-size:13px;">None</div>'}
+    </div>
+  </div>`;
+  document.getElementById('detailPanel').innerHTML = html;
+  document.getElementById('detailOverlay').style.display = 'flex';
+};
+
+window.closeDetail = function(e) {
+  if (!e || e.target === document.getElementById('detailOverlay')) {
+    document.getElementById('detailOverlay').style.display = 'none';
+  }
+};
+
+window.showConversation = function(groupId, uidA, uidB) {
+  const appA = Object.values(window._state.apps).find(a => a.ownerUid === uidA && a.groupId === groupId);
+  const appB = Object.values(window._state.apps).find(a => a.ownerUid === uidB && a.groupId === groupId);
+  const nameA = appA?.appName || shortUid(uidA);
+  const nameB = appB?.appName || shortUid(uidB);
+
+  const msgs = window._state.messages
+    .filter(m => m.groupId === groupId &&
+      ((m.senderUid === uidA && m.recipientUid === uidB) || (m.senderUid === uidB && m.recipientUid === uidA)))
+    .sort((a, b) => (a.sentAt?.seconds || 0) - (b.sentAt?.seconds || 0));
+
+  const bubbles = msgs.map(m => {
+    const isA = m.senderUid === uidA;
+    const senderName = isA ? nameA : nameB;
+    const isDeleted = !!m.deletedAt;
+    const align = isA ? 'flex-start' : 'flex-end';
+    const bg = isA ? '#f0f0f5' : '#ede9fe';
+    const textColor = isA ? '#1a1a1a' : '#4c1d95';
+    return `<div style="display:flex;flex-direction:column;align-items:${align};margin-bottom:10px;">
+      <div style="font-size:10px;color:#999;margin-bottom:2px;padding:0 4px;">${senderName} · ${ts(m.sentAt)}${m.readAt ? ' · read' : ''}</div>
+      <div style="max-width:85%;background:${bg};color:${textColor};padding:8px 12px;border-radius:12px;font-size:13px;line-height:1.5;${isDeleted ? 'font-style:italic;color:#aaa;' : ''}">
+        ${isDeleted ? 'Message deleted' : (m.text ? m.text.replace(/</g,'&lt;').replace(/>/g,'&gt;') : '')}
+        ${!isDeleted && m.screenshotUrl ? `<div class="screenshot-thumb" style="margin-top:6px;"><img src="${m.screenshotUrl}" alt="Screenshot" onclick="openScreenshot('${m.screenshotUrl}')" title="Click to enlarge" style="width:80px;height:80px;"></div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  let html = `<div class="detail-header"><h3>${nameA} ↔ ${nameB}</h3><button class="close-btn" onclick="closeDetail()">✕</button></div>
+  <div class="detail-body">
+    <div class="detail-section" style="margin-bottom:0;">
+      <h4>${msgs.length} message${msgs.length !== 1 ? 's' : ''}</h4>
+      <div style="display:flex;flex-direction:column;padding-top:8px;">
+        ${bubbles || '<div style="color:#aaa;font-size:13px;">No messages</div>'}
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('detailPanel').innerHTML = html;
+  document.getElementById('detailOverlay').style.display = 'flex';
+};
+
+window.openScreenshot = function(url, caption) {
+  document.getElementById('screenshotImg').src = url;
+  const capEl = document.getElementById('screenshotCaption');
+  if (caption) {
+    capEl.textContent = caption;
+    capEl.style.display = 'block';
+  } else {
+    capEl.style.display = 'none';
+  }
+  document.getElementById('screenshotOverlay').classList.add('open');
+};
+
+window.closeScreenshot = function(e) {
+  if (!e || e.target === document.getElementById('screenshotOverlay') || e.target.classList.contains('sc-close')) {
+    document.getElementById('screenshotOverlay').classList.remove('open');
+    document.getElementById('screenshotImg').src = '';
+    document.getElementById('screenshotCaption').style.display = 'none';
+  }
+};
+</script>
+</body>
+</html>
