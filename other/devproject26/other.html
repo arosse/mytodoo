@@ -761,9 +761,10 @@ window.refreshCurrentPage = async function() {
     showToast('Refreshed');
   } catch (e) {
     viewEl.innerHTML = prevHtml;
-    viewEl.style.opacity = '1';
     showToast('Refresh failed — see console');
     console.error('refreshCurrentPage error:', e);
+  } finally {
+    viewEl.style.opacity = '1';
   }
 };
 
