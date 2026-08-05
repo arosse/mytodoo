@@ -982,6 +982,20 @@ function renderGroupDetail(groupId) {
       // Real data always wins over the eviction marker — an evicted tester
       // (or an evicted app owner) may still have a genuine install/report
       // from before the eviction happened.
+      //
+      // status === 'installed' is checked BEFORE reportType: the tester may
+      // have reported a problem in an earlier phase and later succeeded — the
+      // app has no code path that clears a stale reportType once a later
+      // successful install happens on the same doc, so a confirmed install
+      // must take visual priority over a leftover report.
+      if (inst && inst.status === 'installed') {
+        if (!evicted && !ownerEvicted) { installsExpected++; installsDone++; }
+        const style = inst.screenshotUrl ? 'cursor:pointer;' : '';
+        const installCaption = `Installed${inst.installedAt ? ' — ' + ts(inst.installedAt) : ''}`;
+        const click = inst.screenshotUrl ? `onclick="openScreenshot('${inst.screenshotUrl}', '${installCaption.replace(/'/g, "\\'")}')"` : '';
+        const tip = inst.reportType ? `Installed (older ${inst.reportType} report on file — not currently relevant)` : (inst.screenshotUrl ? 'Click to view install screenshot' : 'Installed');
+        return `<td style="text-align:center;vertical-align:middle;${style}" title="${tip}" ${click}>✅</td>`;
+      }
       if (inst && inst.reportType) {
         const style = inst.screenshotUrl ? 'cursor:pointer;' : '';
         // Screenshots for broken-app reports are only ever uploaded in Phase 0.
@@ -995,14 +1009,6 @@ function renderGroupDetail(groupId) {
         const tip = inst.reportType + (inst.reportComment ? ': ' + inst.reportComment : '') + (inst.screenshotUrl ? ' (click for screenshot)' : '');
         if (!evicted && !ownerEvicted) installsExpected++;
         return `<td style="text-align:center;vertical-align:middle;${style}" title="${tip}" ${click}>🔴</td>`;
-      }
-      if (inst && inst.status === 'installed') {
-        if (!evicted && !ownerEvicted) { installsExpected++; installsDone++; }
-        const style = inst.screenshotUrl ? 'cursor:pointer;' : '';
-        const installCaption = `Installed${inst.installedAt ? ' — ' + ts(inst.installedAt) : ''}`;
-        const click = inst.screenshotUrl ? `onclick="openScreenshot('${inst.screenshotUrl}', '${installCaption.replace(/'/g, "\\'")}')"` : '';
-        const tip = inst.screenshotUrl ? 'Click to view install screenshot' : 'Installed';
-        return `<td style="text-align:center;vertical-align:middle;${style}" title="${tip}" ${click}>✅</td>`;
       }
 
       // No real data — now the eviction marker is meaningful: this task
