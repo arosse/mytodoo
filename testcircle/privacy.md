@@ -1,5 +1,5 @@
 # Privacy Policy
-*Last updated: July 2026*
+*Last updated: August 2026*
 
 **TestCircle** is developed by **GreenAnt Apps**.
 
@@ -45,6 +45,7 @@ We use your information solely to operate the TestCircle platform:
 - To track testing progress, individual test assignments, and task completion
 - To send you notifications about testing activity and feedback received
 - To generate an AI-assisted summary of feedback received on your app
+- To automatically translate non-English feedback into English
 - To detect and address abuse, harassment, or low-quality content (via our in-app flag system for testing feedback, text verification prompts for messages, and user email reports)
 
 We do not sell your data, use it for advertising, or share it with third parties except as described in Section 3.
@@ -54,7 +55,7 @@ We do not sell your data, use it for advertising, or share it with third parties
 TestCircle uses the following third-party services:
 
 - **Firebase (Google)** — authentication, database, file storage, and push notifications. Subject to Google's Privacy Policy at [policies.google.com/privacy](https://policies.google.com/privacy).
-- **Google AI (via Firebase AI Logic)** — used to generate anonymised summaries of tester feedback. Only anonymised feedback text is sent — no personal data, no account information, no identifiers. A note about this processing is included in this policy in compliance with GDPR requirements.
+- **Google AI (Gemini API)** — used to (1) generate a summary of tester feedback for developers, and (2) automatically translate non-English tester feedback into English. Only feedback text is sent for these purposes — no name, email, account information, or other identifier. A note about this processing is included in this policy in compliance with GDPR requirements.
 - **Google Play** — testers access your app via the Google Play Store closed testing track.
 
 ## 4. Data Retention
