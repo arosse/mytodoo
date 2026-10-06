@@ -2,7 +2,7 @@
 
 # Privacy Policy
 
-*Last updated: May 1st, 2026*
+*Last updated: October 6th, 2026*
 
 **KcalSimple** is developed by **GreenAnt Apps**.
 
@@ -10,7 +10,7 @@ Your privacy is important to us. This Privacy Policy explains how we handle any 
 
 ## 1. Information We Collect
 
-**KcalSimple does not collect, store, or share any personal information.** All data you enter in the app (food logs, calorie goals, custom foods) is stored exclusively on your device and never transmitted to us or any third party.
+**KcalSimple does not collect, store, or share any personal information.** All data you enter in the app (food logs, calorie goals, weight entries, custom foods) is stored exclusively on your device and never transmitted to us or any third party. The camera is used only to scan barcodes; images are processed on your device and are never stored or transmitted.
 
 ## 2. Third-Party Services
 
@@ -25,9 +25,11 @@ Both services are free and publicly available. Neither receives any personal inf
 
 KcalSimple contains **no advertisements** and collects **no analytics data** of any kind.
 
-## 4. In-App Purchases
+## 4. Optional Support Tips (In-App Purchases)
 
-There are **no in-app purchases** or monetization features in KcalSimple.
+KcalSimple is free to use, and every feature is available to everyone. The app includes optional one-time support tips that you can purchase if you would like to support the developer. They unlock nothing and are never required.
+
+Tips are processed entirely by Google Play. We never see or store your payment details, and purchases are subject to Google Play's payment and refund policies.
 
 ## 5. Data Security
 

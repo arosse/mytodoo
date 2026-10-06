@@ -1,12 +1,12 @@
 # Terms & Conditions
 
-*Last updated: May 1st, 2026*
+*Last updated: October 6th, 2026*
 
 Welcome to **KcalSimple**, a calorie tracking app developed by **GreenAnt Apps**. These Terms & Conditions ("Terms") govern your use of the app. By using KcalSimple, you agree to be bound by these Terms.
 
 ## 1. Use of the App
 
-KcalSimple is provided for personal, non-commercial health and wellness purposes. You may use the app on your own device to track your daily calorie intake. The app contains **no advertisements, no in-app purchases, and does not collect, store, or share any personal data**. All data entered in the app is stored locally on your device.
+KcalSimple is provided for personal, non-commercial health and wellness purposes. You may use the app on your own device to track your daily calorie intake. The app contains **no advertisements** and **does not collect, store, or share any personal data**. It offers optional support tips (see Section 3). All data entered in the app is stored locally on your device.
 
 ## 2. Health Disclaimer
 
@@ -14,7 +14,7 @@ KcalSimple is a tool to assist with personal calorie tracking and is **not a sub
 
 ## 3. Payments
 
-KcalSimple is completely free to download and use. There are no paid features or upgrades within the app.
+KcalSimple is free to download and use, and every feature is available to everyone. The app includes optional one-time support tips that you can purchase if you would like to support the developer. They unlock nothing and are never required. Tips are processed by Google Play and are subject to Google Play's payment and refund policies.
 
 ## 4. Intellectual Property
 

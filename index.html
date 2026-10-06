@@ -1,440 +1,270 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GreenAnt Apps - Math Puzzles & Productivity Tools</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Roboto', sans-serif;
-      margin: 0;
-      background-color: #0d0d0d;
-      color: #f0f0f0;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      align-items: center;
-    }
-    header {
-      width: 100%;
-      background-color: #0d0d0d;
-    }
-    header img {
-      width: 100%;
-      max-height: 350px;
-      object-fit: contain;
-      display: block;
-      background-color: #0d0d0d;
-    }
-    main {
-      max-width: 1000px;
-      width: 90%;
-      padding: 2rem;
-    }
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-      color: #4dd8a8;
-      text-align: center;
-    }
-    h2 {
-      font-size: 2rem;
-      color: #5dccb8;
-      margin-top: 3rem;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-    p {
-      line-height: 1.6;
-      font-size: 1.1rem;
-      text-align: center;
-    }
-    a {
-      color: #5dccb8;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-    
-    .rating-image-link:hover img {
-      transform: scale(1.05);
-    }
-    
-    /* Featured App Section */
-    .featured-app {
-      background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
-      border: 2px solid #4dd8a8;
-      border-radius: 15px;
-      padding: 2rem;
-      margin: 2rem 0;
-      box-shadow: 0 0 30px rgba(77, 216, 168, 0.2);
-    }
-    
-    .app-header {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1.5rem;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-    }
-    
-    .app-icon {
-      width: 100px;
-      height: 100px;
-      border-radius: 20px;
-      box-shadow: 0 4px 15px rgba(77, 216, 168, 0.3);
-    }
-    
-    .app-title {
-      font-size: 2.2rem;
-      color: #4dd8a8;
-      margin: 0;
-    }
-    
-    .app-tagline {
-      font-size: 1.2rem;
-      color: #5dccb8;
-      font-style: italic;
-      margin: 0.5rem 0 1.5rem 0;
-    }
-    
-    .download-btn {
-      display: inline-block;
-      background: linear-gradient(135deg, #4dd8a8 0%, #5dccb8 100%);
-      color: #0d0d0d;
-      padding: 1rem 2rem;
-      border-radius: 30px;
-      font-size: 1.2rem;
-      font-weight: bold;
-      text-decoration: none;
-      margin: 1rem 0.5rem;
-      transition: transform 0.3s, box-shadow 0.3s;
-      box-shadow: 0 4px 15px rgba(77, 216, 168, 0.3);
-    }
-    
-    .download-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 25px rgba(77, 216, 168, 0.5);
-      text-decoration: none;
-    }
-    
-    .social-links {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      margin: 2rem 0;
-      flex-wrap: wrap;
-    }
-    
-    .social-link {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.8rem 1.5rem;
-      background-color: #1a1a1a;
-      border: 1px solid #5dccb8;
-      border-radius: 25px;
-      transition: all 0.3s;
-    }
-    
-    .social-link:hover {
-      background-color: #5dccb8;
-      color: #0d0d0d;
-      transform: scale(1.05);
-    }
-    
-    .stats {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      margin: 2rem 0;
-      flex-wrap: wrap;
-    }
-    
-    .stat-item {
-      text-align: center;
-      padding: 1rem;
-      background-color: #1a1a1a;
-      border-radius: 10px;
-      min-width: 120px;
-    }
-    
-    .stat-number {
-      font-size: 1.8rem;
-      color: #4dd8a8;
-      font-weight: bold;
-    }
-    
-    .stat-label {
-      font-size: 0.9rem;
-      color: #888;
-      margin-top: 0.5rem;
-    }
-    
-    /* Sample Puzzles */
-    .puzzle-showcase {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      margin: 2rem 0;
-    }
-    
-    .puzzle-card {
-      background-color: #1a1a1a;
-      border: 1px solid #4dd8a8;
-      border-radius: 10px;
-      padding: 1.5rem;
-      text-align: center;
-      transition: transform 0.3s;
-    }
-    
-    .puzzle-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 5px 20px rgba(77, 216, 168, 0.2);
-    }
-    
-    .puzzle-numbers {
-      font-size: 2rem;
-      color: #5dccb8;
-      font-weight: bold;
-      margin: 1rem 0;
-      letter-spacing: 0.3rem;
-    }
-    
-    /* Other Apps Section */
-    .other-apps {
-      margin-top: 3rem;
-      padding-top: 2rem;
-      border-top: 1px solid #333;
-    }
-    
-    .app-card {
-      background-color: #1a1a1a;
-      border: 1px solid #5dccb8;
-      border-radius: 10px;
-      padding: 2rem;
-      margin: 2rem 0;
-      transition: transform 0.3s;
-    }
-    
-    .app-card:hover {
-      transform: scale(1.02);
-    }
-    
-    .video-container {
-      position: relative;
-      padding-bottom: 56.25%;
-      height: 0;
-      overflow: hidden;
-      max-width: 100%;
-      margin-top: 1rem;
-      border-radius: 10px;
-    }
-    
-    .video-container iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border-radius: 10px;
-    }
-    
-    footer {
-      width: 100%;
-      background-color: #0d0d0d;
-      text-align: center;
-      padding: 1rem;
-      font-size: 0.9rem;
-      color: #888;
-      margin-top: auto;
-    }
-    
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 2rem;
-      }
-      .app-title {
-        font-size: 1.8rem;
-      }
-      .stats {
-        gap: 1rem;
-      }
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GreenAnt Apps — Independent Android apps</title>
+  <meta name="description" content="GreenAnt Apps is an independent studio making clean, dependable Android apps for everyday life and for fellow developers.">
+  <link rel="canonical" href="https://greenantapps.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="GreenAnt Apps">
+  <meta property="og:title" content="GreenAnt Apps — Independent Android apps">
+  <meta property="og:description" content="An independent studio making clean, dependable Android apps.">
+  <meta property="og:url" content="https://greenantapps.com/">
+  <meta name="theme-color" content="#fafaf7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0c120e" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="/assets/img/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="/assets/js/site.js" defer></script>
 </head>
 <body>
-  <header>
-    <img src="green_ant_apps_feature.jpg" alt="GreenAnt Apps">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- ===== Header (same on every page) ===== -->
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="/" aria-label="GreenAnt Apps home">
+        <img class="brand-logo" src="/assets/img/logo.png" alt="" width="42" height="42">
+        <span>GreenAnt <span class="brand-sub">Apps</span></span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <details class="dropdown">
+          <summary>Apps <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+          <div class="dropdown-panel">
+            <a href="/testcircle/"><img src="/assets/img/apps/testcircle.png" alt=""><div><strong>TestCircle</strong><span>Peer testing for Android devs</span></div></a>
+            <a href="/kcalsimple/"><img src="/assets/img/apps/kcalsimple.png" alt=""><div><strong>KcalSimple</strong><span>Calorie &amp; weight tracker</span></div></a>
+            <a href="/mytodoo/"><img src="/assets/img/apps/mytodoo.png" alt=""><div><strong>MyToDoo</strong><span>To-do lists with reminders</span></div></a>
+            <a href="/appearningstracker/"><img src="/assets/img/apps/appearningstracker.png" alt=""><div><strong>App Earnings Tracker</strong><span>Google Play earnings, simplified</span></div></a>
+            <a href="/formula10/"><img src="/assets/img/apps/formula10.png" alt=""><div><strong>Formula 10</strong><span>Math puzzle game</span></div></a>
+            <a class="all-apps" href="/#apps">View all apps</a>
+          </div>
+        </details>
+        <a class="hide-sm" href="/#about">About</a>
+        <a class="nav-cta" href="/#contact">Contact</a>
+      </nav>
+    </div>
   </header>
-  
-  <main>
-    <h1>Welcome to GreenAnt Apps</h1>
-    <p>Creators of simple, elegant mobile tools for your daily life</p>
-    
-    <!-- Featured App: Formula 10 -->
-    <div class="featured-app">
-      <div class="app-header">
-        <h2 class="app-title">🧩 Formula 10: Math Puzzle Game</h2>
-      </div>
-      <p class="app-tagline">Turning numbers into fun! Can you solve the puzzles to make 10?</p>
-      
-      <p>Challenge your brain with over 9,000 unique math puzzles! Use addition, subtraction, multiplication, division, and even square roots to make the number 10. Perfect for quick brain workouts and math lovers of all ages.</p>
-      
-      <!-- Google Play Rating -->
-      <div style="text-align: center; margin: 1.5rem 0;">
-        <a href="https://play.google.com/store/apps/details?id=com.greenant.formula10" target="_blank" class="rating-image-link" style="display: inline-block; transition: transform 0.3s;">
-          <img src="formula10_rating.png" alt="5-star rating on Google Play" style="max-width: 300px; width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 15px rgba(77, 216, 168, 0.2);">
-        </a>
-      </div>
-      
-      <div class="stats">
-        <div class="stat-item">
-          <div class="stat-number">9,000+</div>
-          <div class="stat-label">Puzzles</div>
+
+  <main id="main">
+
+    <!-- ===== Hero ===== -->
+    <section class="hero">
+      <div class="container">
+        <div>
+          <span class="hero-badge"><span class="dot"></span>Independent Android studio</span>
+          <h1>Android apps<br><em>by GreenAnt.</em></h1>
+          <p class="hero-lead">GreenAnt Apps makes clean, dependable Android apps — from calorie tracking and math games to tools for fellow app developers.</p>
+          <div class="btn-row">
+            <a class="btn btn-primary" href="#apps">
+              Explore our apps
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+            <a class="btn btn-secondary" href="https://play.google.com/store/apps/dev?id=8246662403240536040" target="_blank" rel="noopener">
+              View on Google Play
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+            </a>
+          </div>
         </div>
-        <div class="stat-item">
-          <div class="stat-number">100+</div>
-          <div class="stat-label">Downloads</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number">100%</div>
-          <div class="stat-label">Free & No Ads</div>
+
+        <div class="icon-cluster" aria-label="Our apps">
+          <div class="ring"></div>
+          <div class="ring inner"></div>
+          <a class="center" href="/testcircle/" title="TestCircle"><img src="/assets/img/apps/testcircle.png" alt="TestCircle"></a>
+          <a class="p1" href="/kcalsimple/" title="KcalSimple"><img src="/assets/img/apps/kcalsimple.png" alt="KcalSimple"></a>
+          <a class="p2" href="/mytodoo/" title="MyToDoo"><img src="/assets/img/apps/mytodoo.png" alt="MyToDoo"></a>
+          <a class="p3" href="/formula10/" title="Formula 10"><img src="/assets/img/apps/formula10.png" alt="Formula 10"></a>
+          <a class="p4" href="/appearningstracker/" title="App Earnings Tracker"><img src="/assets/img/apps/appearningstracker.png" alt="App Earnings Tracker"></a>
         </div>
       </div>
-      
-      <h3 style="color: #5dccb8; margin-top: 2rem;">Try These Sample Puzzles:</h3>
-      <div class="puzzle-showcase">
-        <div class="puzzle-card">
-          <p style="margin: 0; color: #888;">Can you make 10?</p>
-          <div class="puzzle-numbers">2 4 3 1</div>
-          <p style="margin: 0; font-size: 0.9rem; color: #4dd8a8;">Solution: 2×4+3-1=10</p>
+    </section>
+
+    <!-- ===== Apps ===== -->
+    <section class="section section-alt" id="apps">
+      <div class="container">
+        <div class="section-head">
+          <h2 style="margin-top:0">All apps</h2>
         </div>
-        <div class="puzzle-card">
-          <p style="margin: 0; color: #888;">Your turn!</p>
-          <div class="puzzle-numbers">5 6 1 0</div>
-          <p style="margin: 0; font-size: 0.9rem; color: #666;">Try to solve this one!</p>
-        </div>
-        <div class="puzzle-card">
-          <p style="margin: 0; color: #888;">Challenge mode</p>
-          <div class="puzzle-numbers">7 9 2 3</div>
-          <p style="margin: 0; font-size: 0.9rem; color: #666;">Multiple solutions!</p>
-        </div>
-      </div>
-      
-      <div style="text-align: center; margin-top: 2rem;">
-        <a href="https://play.google.com/store/apps/details?id=com.greenant.formula10" 
-           class="download-btn" 
-           target="_blank">
-          📱 Download Formula 10 Now
-        </a>
-      </div>
-      
-      <h3 style="color: #5dccb8; margin-top: 2rem;">Follow for More Puzzles:</h3>
-      <div class="social-links">
-        <a href="https://www.instagram.com/formula10puzzle/" class="social-link" target="_blank">
-          📸 Instagram
-        </a>
-        <a href="https://www.tiktok.com/@formula10puzzle/" class="social-link" target="_blank">
-          🎵 TikTok
-        </a>
-        <a href="https://www.youtube.com/@Formula10Puzzle" class="social-link" target="_blank">
-          ▶️ YouTube
-        </a>
-      </div>
-      
-      <!-- Social Media Embeds -->
-      <div style="margin-top: 2rem;">
-        <h3 style="color: #5dccb8; margin-bottom: 1.5rem;">Recent Puzzles from Our Community:</h3>
-        
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
-          <!-- Instagram Embed -->
-          <div style="background-color: #1a1a1a; border-radius: 10px; padding: 1rem; overflow: hidden;">
-            <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/formula10puzzle/" data-instgrm-version="14" style="background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; max-width:100%; min-width:326px; padding:0; width:99.375%; width:-webkit-calc(100% - 2px); width:calc(100% - 2px);">
-              <div style="padding:16px;">
-                <a href="https://www.instagram.com/formula10puzzle/" style="background:#FFFFFF; line-height:0; padding:0 0; text-align:center; text-decoration:none; width:100%;" target="_blank">
-                  <div style="display: flex; flex-direction: row; align-items: center;">
-                    <div style="background-color: #F4F4F4; border-radius: 50%; flex-grow: 0; height: 40px; margin-right: 14px; width: 40px;"></div>
-                    <div style="display: flex; flex-direction: column; flex-grow: 1; justify-content: center;">
-                      <div style="background-color: #F4F4F4; border-radius: 4px; flex-grow: 0; height: 14px; margin-bottom: 6px; width: 100px;"></div>
-                      <div style="background-color: #F4F4F4; border-radius: 4px; flex-grow: 0; height: 14px; width: 60px;"></div>
-                    </div>
-                  </div>
-                  <div style="padding: 19% 0;"></div>
-                  <div style="display:block; height:50px; margin:0 auto 12px; width:50px;">
-                    <svg width="50px" height="50px" viewBox="0 0 60 60" version="1.1" xmlns="https://www.w3.org/2000/svg">
-                      <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                        <g transform="translate(-511.000000, -20.000000)" fill="#000000">
-                          <g><path d="M556.869,30.41 C554.814,30.41 553.148,32.076 553.148,34.131 C553.148,36.186 554.814,37.852 556.869,37.852 C558.924,37.852 560.59,36.186 560.59,34.131 C560.59,32.076 558.924,30.41 556.869,30.41 M541,60.657 C535.114,60.657 530.342,55.887 530.342,50 C530.342,44.114 535.114,39.342 541,39.342 C546.887,39.342 551.658,44.114 551.658,50 C551.658,55.887 546.887,60.657 541,60.657 M541,33.886 C532.1,33.886 524.886,41.1 524.886,50 C524.886,58.899 532.1,66.113 541,66.113 C549.9,66.113 557.115,58.899 557.115,50 C557.115,41.1 549.9,33.886 541,33.886 M565.378,62.101 C565.244,65.022 564.756,66.606 564.346,67.663 C563.803,69.06 563.154,70.057 562.106,71.106 C561.058,72.155 560.06,72.803 558.662,73.347 C557.607,73.757 556.021,74.244 553.102,74.378 C549.944,74.521 548.997,74.552 541,74.552 C533.003,74.552 532.056,74.521 528.898,74.378 C525.979,74.244 524.393,73.757 523.338,73.347 C521.94,72.803 520.942,72.155 519.894,71.106 C518.846,70.057 518.197,69.06 517.654,67.663 C517.244,66.606 516.755,65.022 516.623,62.101 C516.479,58.943 516.448,57.996 516.448,50 C516.448,42.003 516.479,41.056 516.623,37.899 C516.755,34.978 517.244,33.391 517.654,32.338 C518.197,30.938 518.846,29.942 519.894,28.894 C520.942,27.846 521.94,27.196 523.338,26.654 C524.393,26.244 525.979,25.756 528.898,25.623 C532.057,25.479 533.004,25.448 541,25.448 C548.997,25.448 549.943,25.479 553.102,25.623 C556.021,25.756 557.607,26.244 558.662,26.654 C560.06,27.196 561.058,27.846 562.106,28.894 C563.154,29.942 563.803,30.938 564.346,32.338 C564.756,33.391 565.244,34.978 565.378,37.899 C565.522,41.056 565.552,42.003 565.552,50 C565.552,57.996 565.522,58.943 565.378,62.101 M570.82,37.631 C570.674,34.438 570.167,32.258 569.425,30.349 C568.659,28.377 567.633,26.702 565.965,25.035 C564.297,23.368 562.623,22.342 560.652,21.575 C558.743,20.834 556.562,20.326 553.369,20.18 C550.169,20.033 549.148,20 541,20 C532.853,20 531.831,20.033 528.631,20.18 C525.438,20.326 523.257,20.834 521.349,21.575 C519.376,22.342 517.703,23.368 516.035,25.035 C514.368,26.702 513.342,28.377 512.574,30.349 C511.834,32.258 511.326,34.438 511.181,37.631 C511.035,40.831 511,41.851 511,50 C511,58.147 511.035,59.17 511.181,62.369 C511.326,65.562 511.834,67.743 512.574,69.651 C513.342,71.625 514.368,73.296 516.035,74.965 C517.703,76.634 519.376,77.658 521.349,78.425 C523.257,79.167 525.438,79.673 528.631,79.82 C531.831,79.965 532.853,80.001 541,80.001 C549.148,80.001 550.169,79.965 553.369,79.82 C556.562,79.673 558.743,79.167 560.652,78.425 C562.623,77.658 564.297,76.634 565.965,74.965 C567.633,73.296 568.659,71.625 569.425,69.651 C570.167,67.743 570.674,65.562 570.82,62.369 C570.966,59.17 571,58.147 571,50 C571,41.851 570.966,40.831 570.82,37.631"></path></g></g></g>
-                    </svg>
-                  </div>
-                  <div style="padding-top: 8px;">
-                    <div style="color:#3897f0; font-family:Arial,sans-serif; font-size:14px; font-style:normal; font-weight:550; line-height:18px;">View this profile on Instagram</div>
-                  </div>
-                </a>
+
+        <div class="app-grid">
+
+          <!-- TestCircle (featured) -->
+          <article class="app-card featured">
+            <div style="display:flex;flex-direction:column">
+              <div class="app-card-top">
+                <div class="app-icon"><img src="/assets/img/apps/testcircle.png" alt=""></div>
+                <div>
+                  <h3>TestCircle</h3>
+                  <p class="app-cat">Developer tools</p>
+                </div>
+                <span class="tag" style="margin-left:auto">Featured</span>
               </div>
-            </blockquote>
-            <script async src="//www.instagram.com/embed.js"></script>
-          </div>
-          
-          <!-- TikTok Embed -->
-          <div style="background-color: #1a1a1a; border-radius: 10px; padding: 1rem; display: flex; align-items: center; justify-content: center;">
-            <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@formula10puzzle" data-unique-id="formula10puzzle" data-embed-type="creator" style="max-width: 780px; min-width: 288px;">
-              <section>
-                <a target="_blank" href="https://www.tiktok.com/@formula10puzzle?refer=creator_embed">@formula10puzzle</a>
-              </section>
-            </blockquote>
-            <script async src="https://www.tiktok.com/embed.js"></script>
-          </div>
+              <p class="app-desc">A peer-to-peer testing platform for indie Android developers. Team up with other developers, test each other's apps, and work toward Google Play's closed-testing requirement with real feedback along the way.</p>
+              <ul class="featured-points">
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Get matched into a testing group with other developers</li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Five testing phases over 14 days, with structured feedback</li>
+                <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Free group testing: no subscription, no sign-up fees</li>
+              </ul>
+              <div class="app-card-links">
+                <a class="stretched" href="/testcircle/">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a class="play-link" href="https://play.google.com/store/apps/details?id=com.greenant.testcircle" target="_blank" rel="noopener">Google Play <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+              </div>
+            </div>
+            <div class="featured-aside" aria-hidden="true">
+              <div class="app-icon"><img src="/assets/img/apps/testcircle.png" alt=""></div>
+            </div>
+          </article>
+
+          <!-- KcalSimple -->
+          <article class="app-card">
+            <div class="app-card-top">
+              <div class="app-icon"><img src="/assets/img/apps/kcalsimple.png" alt=""></div>
+              <div>
+                <h3>KcalSimple</h3>
+                <p class="app-cat">Health &amp; fitness</p>
+              </div>
+            </div>
+            <p class="app-desc">A minimal calorie and weight tracker. Log what you eat in seconds and see your daily intake, with no complex macros or fancy AI features.</p>
+            <ul class="featured-points">
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>No accounts or sign-up questionnaires</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Completely free, with no ads</li>
+              <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Privacy friendly: your data stays on your device</li>
+            </ul>
+            <div class="app-card-links">
+              <a class="stretched" href="/kcalsimple/">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+              <a class="play-link" href="https://play.google.com/store/apps/details?id=com.greenant.kcalsimple" target="_blank" rel="noopener">Google Play <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+            </div>
+          </article>
+
+          <!-- MyToDoo -->
+          <article class="app-card">
+            <div class="app-card-top">
+              <div class="app-icon"><img src="/assets/img/apps/mytodoo.png" alt=""></div>
+              <div>
+                <h3>MyToDoo</h3>
+                <p class="app-cat">Productivity</p>
+              </div>
+            </div>
+            <p class="app-desc">A customizable to-do list with custom lists, gestures and local reminders. Free and ad-free, with an optional one-time Premium upgrade.</p>
+            <div class="app-card-links">
+              <a class="stretched" href="/mytodoo/">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+              <a class="play-link" href="https://play.google.com/store/apps/details?id=com.greenant.mytodoo" target="_blank" rel="noopener">Google Play <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+            </div>
+          </article>
+
+          <!-- App Earnings Tracker -->
+          <article class="app-card">
+            <div class="app-card-top">
+              <div class="app-icon"><img src="/assets/img/apps/appearningstracker.png" alt=""></div>
+              <div>
+                <h3>App Earnings Tracker</h3>
+                <p class="app-cat">Developer tools</p>
+              </div>
+            </div>
+            <p class="app-desc">Import your Google Play earnings reports and see what you actually take home after taxes. Everything stays on your device.</p>
+            <div class="app-card-links">
+              <a class="stretched" href="/appearningstracker/">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+              <span class="tag neutral">Coming soon</span>
+            </div>
+          </article>
+
+          <!-- Formula 10 -->
+          <article class="app-card">
+            <div class="app-card-top">
+              <div class="app-icon"><img src="/assets/img/apps/formula10.png" alt=""></div>
+              <div>
+                <h3>Formula 10</h3>
+                <p class="app-cat">Puzzle game</p>
+              </div>
+            </div>
+            <p class="app-desc">Over 9,000 math puzzles with a single goal: combine the numbers to make 10 using +, −, ×, ÷ and more.</p>
+            <div class="app-card-links">
+              <a class="stretched" href="/formula10/">Learn more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+              <a class="play-link" href="https://play.google.com/store/apps/details?id=com.greenant.formula10" target="_blank" rel="noopener">Google Play <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+            </div>
+          </article>
+
         </div>
       </div>
-    </div>
-    
-    <!-- Other Apps Section -->
-    <div class="other-apps">
-      <h2>Our Other Apps</h2>
-      
-      <div class="app-card">
-        <h3 style="color: #5dccb8;">✅ MyToDoo - Simple Task Management</h3>
-        <p>Stay organized with our elegant productivity app. Manage your tasks efficiently with a clean, intuitive interface.</p>
-        
-        <div class="video-container">
-          <iframe 
-            src="https://www.youtube.com/embed/jWRkMM6bj4o" 
-            frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowfullscreen>
-          </iframe>
+    </section>
+
+    <!-- ===== About ===== -->
+    <section class="section" id="about">
+      <div class="container">
+        <div class="section-head" style="margin-bottom:0">
+          <span class="eyebrow">About</span>
+          <h2>An independent Android studio.</h2>
+          <p>GreenAnt Apps is an independent studio that makes Android apps, distributed through Google Play. Each app has its own privacy policy, linked in the footer of every page.</p>
         </div>
-        
-        <div style="text-align: center; margin-top: 1.5rem;">
-          <a href="https://play.google.com/store/apps/details?id=com.greenant.mytodoo" 
-             class="download-btn" 
-             target="_blank">
-            📱 Download MyToDoo
+      </div>
+    </section>
+
+    <!-- ===== Contact ===== -->
+    <section class="section" id="contact" style="padding-top:0">
+      <div class="container">
+        <div class="cta-band">
+          <div>
+            <h2>Contact</h2>
+            <p>For support, feedback or bug reports, send us an email.</p>
+          </div>
+          <a class="btn" href="mailto:greenantapps@gmail.com">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+            greenantapps@gmail.com
           </a>
         </div>
       </div>
-      
-      <div style="text-align: center; margin-top: 2rem;">
-        <p>
-          🌐 <a href="https://play.google.com/store/apps/dev?id=8246662403240536040" target="_blank">
-            View All Our Apps on Google Play
-          </a>
-        </p>
-      </div>
-    </div>
+    </section>
+
   </main>
-  
-  <footer>
-    &copy; 2026 GreenAnt Apps. All rights reserved.
+
+  <!-- ===== Footer (same on every page) ===== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <a class="brand" href="/">
+            <img class="brand-logo" src="/assets/img/logo.png" alt="" width="42" height="42">
+            <span>GreenAnt <span class="brand-sub">Apps</span></span>
+          </a>
+          <p>Independent Android app studio.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Apps</h4>
+          <ul>
+            <li><a href="/testcircle/">TestCircle</a></li>
+            <li><a href="/kcalsimple/">KcalSimple</a></li>
+            <li><a href="/mytodoo/">MyToDoo</a></li>
+            <li><a href="/appearningstracker/">App Earnings Tracker</a></li>
+            <li><a href="/formula10/">Formula 10</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Privacy</h4>
+          <ul>
+            <li><a href="/testcircle/privacy">TestCircle</a></li>
+            <li><a href="/kcalsimple/privacy">KcalSimple</a></li>
+            <li><a href="/privacy">MyToDoo</a></li>
+            <li><a href="/appearningstracker/privacy">App Earnings Tracker</a></li>
+            <li><a href="/formula10/privacy">Formula 10</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Studio</h4>
+          <ul>
+            <li><a href="/#about">About</a></li>
+            <li><a href="/#contact">Contact</a></li>
+            <li><a href="https://play.google.com/store/apps/dev?id=8246662403240536040" target="_blank" rel="noopener">Google Play</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 GreenAnt Apps. All rights reserved.</span>
+        <a href="mailto:greenantapps@gmail.com">greenantapps@gmail.com</a>
+      </div>
+    </div>
   </footer>
 </body>
 </html>

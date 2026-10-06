@@ -1,6 +1,6 @@
 # Terms & Conditions
 
-_Last updated: June 21, 2025_
+_Last updated: October 6, 2026_
 
 Welcome to **MyToDoo**, a simple and customizable to-do list app. These Terms & Conditions ("Terms") govern your use of the app. By using MyToDoo, you agree to be bound by these Terms.
 
@@ -17,11 +17,11 @@ A one-time Premium upgrade unlocks the following features:
 - Full access to all color customization options
 - Additional preset themes
 
-Purchasing the Premium upgrade is a **one-time, non-refundable payment** processed through the app store (currently €2.99 or local equivalent). By upgrading, you acknowledge that the purchase is final.
+Purchasing the Premium upgrade is a **one-time payment** processed through Google Play (the current price is shown in the Play Store).
 
 ## 3. Payments
 
-Purchasing the Premium upgrade is processed through the app store. Refunds are subject to the app store's policies.
+Payments are processed by Google Play. Refunds are handled by Google Play according to its policies and any rights you have under applicable law.
 
 ## 4. Intellectual Property
 

@@ -1,12 +1,12 @@
 # Terms & Conditions
 
-_Last updated: July 9, 2025_
+_Last updated: October 6, 2026_
 
 Welcome to **Formula10**, a casual math puzzle game developed by **GreenAnt Apps**. These Terms & Conditions ("Terms") govern your use of the app. By using Formula10, you agree to be bound by these Terms.
 
 ## 1. Use of the App
 
-Formula10 is provided for personal, non-commercial entertainment purposes. You may use the app on your own device to enjoy the game. The app contains **no advertisements, no in-app purchases (IAP), and does not collect, store, or share any personal data**.
+Formula10 is provided for personal, non-commercial entertainment purposes. You may use the app on your own device to enjoy the game. The app contains **no advertisements and no in-app purchases (IAP)**, and does not collect, store, or share any personal data. It collects only anonymous usage statistics, as described in our Privacy Policy.
 
 ## 2. Payments
 

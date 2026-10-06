@@ -1,6 +1,6 @@
 # Privacy Policy
 
-_Last updated: January 1, 2026_
+_Last updated: October 6, 2026_
 
 **Formula10** is developed by **GreenAnt Apps**.
 
@@ -8,11 +8,11 @@ Your privacy is important to us. This Privacy Policy explains how we handle any 
 
 ## 1. Information We Collect
 
-**Formula10 does not collect, store, or share any personal information.** The app does not require any permissions that access personal data.
+**Formula10 does not collect your name, email address, or any other directly identifying personal information**, and does not require any permissions that access personal data.
 
 ## 2. Ads and Analytics
 
-Formula10 contains **no advertisements**. The app collects **fully anonymized gameplay statistics, basic device information, and approximate location** to help us improve game balance, track feature usage, and enhance overall gameplay experience. This data is **completely anonymous and does not include personal information**.
+Formula10 contains **no advertisements**. The app collects **anonymous usage statistics** (such as total puzzles solved, XP, active days, gems and app version) to help us improve game balance, track feature usage, and enhance overall gameplay experience. These statistics are sent to **Google Firebase Analytics**, which also automatically collects **basic device information (such as device model, operating system version and language) and approximate location (country or region, derived from your IP address)**, and to our own database (Google Firestore), where each record is tagged with a **random anonymous ID generated on your device**. This data is not linked to your name, email or any account, and we cannot use it to identify you. Learn more about how Google handles data at [policies.google.com/privacy](https://policies.google.com/privacy).
 
 ## 3. In-App Purchases
 
