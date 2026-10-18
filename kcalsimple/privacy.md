@@ -49,9 +49,25 @@ KcalSimple offers optional purchases through Google Play: support tips (individu
 
 To confirm a Premium subscription, the app sends its Google Play purchase token to our server, which checks it with Google Play. We store only an irreversible (hashed) form of the token, together with whether the subscription is active and when it expires, and delete it automatically 30 days after the subscription expires.
 
-## 6. Backups and Deleting Your Data
+## 6. Backups and Deleting Your Data {#delete-data}
 
-The Data & Backup menu lets you export your data to a file, import a backup, or delete all data. Backup files are created on your device and saved or shared wherever you choose; we never receive them. "Delete all data" erases everything KcalSimple stores on your device and deletes your anonymous app ID (if your device is offline at that moment, the ID is deleted automatically within 30 days).
+The Data & Backup menu lets you export your data to a file or import a backup. Backup files are created on your device and saved or shared wherever you choose; we never receive them.
+
+**To delete your data:**
+
+1. Open KcalSimple and open the menu
+2. Tap **Data & Backup**
+3. Tap **Delete all data** and confirm
+
+**What is deleted:** everything KcalSimple stores on your device (food log, weights, My Foods, settings) and your anonymous app ID on our server (if your device is offline at that moment, the ID is deleted automatically within 30 days).
+
+**What is deleted automatically, even without this step:**
+
+- Daily AI estimate counts and technical logs: after 30 days
+- Anonymous app IDs: after 30 days
+- Premium subscription checks (hashed purchase token and status): 30 days after the subscription expires
+
+Photos and texts sent for AI estimates are never stored. Deleting your data does not cancel a Premium subscription: to cancel it, use Google Play's subscription settings. For any question, contact us at **greenantapps@gmail.com**.
 
 ## 7. Data Security
 
