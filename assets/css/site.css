@@ -259,6 +259,7 @@ p { margin: 0; }
 
 /* Third-party badges (Product Hunt, AlternativeTo) under an app hero's buttons */
 .badge-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+.badge-row img { height: 44px; width: auto; }
 
 /* ---------- Generic sections ---------- */
 
@@ -806,6 +807,7 @@ p { margin: 0; }
   .stat-panel-head { padding: 14px 22px; }
   .stats-band { padding-bottom: 56px; }
   .btn-row .btn { flex: 1 1 auto; }
+  .badge-row { justify-content: center; }
 }
 
 @media (prefers-reduced-motion: reduce) {
