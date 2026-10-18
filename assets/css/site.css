@@ -257,6 +257,9 @@ p { margin: 0; }
 
 .btn-row { display: flex; flex-wrap: wrap; gap: 12px; }
 
+/* Third-party badges (Product Hunt, AlternativeTo) under an app hero's buttons */
+.badge-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+
 /* ---------- Generic sections ---------- */
 
 .section { padding: 96px 0; }
