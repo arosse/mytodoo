@@ -1,0 +1,17 @@
+# Languages each app's legal pages (privacy policy, terms) are published in.
+# English is the base file (e.g. testcircle/privacy.md); every other language
+# is the same name with -<code> (e.g. testcircle/privacy-fr.md), where <code>
+# is the app's language code (the "-fr" suffix the app adds to the link).
+#
+# To add a language for an app:
+#   1. create its <page>-<code>.md files next to the English ones
+#      (front matter "lang: <code>", same {% include legal_languages.html %}
+#      line at the top as the English page),
+#   2. add one line below. Every page of that app then shows the new link.
+# Names are written in their own language.
+
+testcircle:
+  - code: en
+    name: English
+  - code: fr
+    name: Français

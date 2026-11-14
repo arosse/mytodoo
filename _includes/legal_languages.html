@@ -1,0 +1,32 @@
+{%- comment -%}
+  Language links for an app's legal pages, from _data/legal_languages.yml.
+  Usage at the top of the page: {% include legal_languages.html app="testcircle" %}
+  English is <page>, any other language <page>-<code>; the current page's
+  language is shown in bold instead of as a link.
+{%- endcomment -%}
+{%- assign langs = site.data.legal_languages[include.app] -%}
+{%- assign base = page.url | remove: ".html" -%}
+{%- assign current = "en" -%}
+{%- for l in langs -%}
+  {%- if l.code != "en" -%}
+    {%- assign suffix = "-" | append: l.code -%}
+    {%- assign n = suffix.size -%}
+    {%- assign start = 0 | minus: n -%}
+    {%- assign tail = base | slice: start, n -%}
+    {%- if tail == suffix -%}
+      {%- assign current = l.code -%}
+      {%- assign keep = base.size | minus: n -%}
+      {%- assign base = base | slice: 0, keep -%}
+    {%- endif -%}
+  {%- endif -%}
+{%- endfor -%}
+<p class="legal-languages">
+{%- for l in langs -%}
+  {%- if l.code == current -%}
+    <strong>{{ l.name }}</strong>
+  {%- else -%}
+    <a href="{{ base }}{% if l.code != 'en' %}-{{ l.code }}{% endif %}" hreflang="{{ l.code }}" lang="{{ l.code }}">{{ l.name }}</a>
+  {%- endif -%}
+  {%- unless forloop.last %} · {% endunless -%}
+{%- endfor -%}
+</p>

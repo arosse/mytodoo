@@ -1,5 +1,10 @@
+---
+lang: en
+---
+{% include legal_languages.html app="testcircle" %}
+
 # Privacy Policy
-*Last updated: October 2026*
+*Last updated: November 2026*
 
 **TestCircle** is developed by **GreenAnt Apps**, which is the controller of the personal data processed through the app (contact: greenantapps@gmail.com).
 
@@ -54,7 +59,8 @@ We use your information solely to operate the TestCircle platform:
 - To verify installs and testing activity (screenshots, or optional automatic usage and installation checks)
 - To send you notifications about testing activity and feedback received
 - To generate an AI-assisted summary of feedback received on your app
-- To automatically translate non-English feedback into English
+- To automatically translate tester feedback into the developer's app language
+- To automatically translate chat messages into the recipient's app language, when the sender or the recipient has the chat's "Automatic translation" option on (it is on by default and can be turned off in any chat)
 - To detect and address abuse, harassment, or low-quality content (via our in-app flag system for testing feedback, text verification prompts for messages, and user email reports)
 
 We do not sell your data, use it for advertising, or share it with third parties except as described in Section 3.
@@ -66,13 +72,14 @@ We do not sell your data, use it for advertising, or share it with third parties
 TestCircle uses the following third-party services:
 
 - **Firebase (Google)** — authentication, database, file storage, and push notifications. Subject to Google's Privacy Policy at [policies.google.com/privacy](https://policies.google.com/privacy).
-- **Google AI (Gemini API)** — used to (1) generate a summary of tester feedback for developers, and (2) automatically translate non-English tester feedback into English. Only feedback text is sent for these purposes — no name, email, account information, or other identifier. A note about this processing is included in this policy in compliance with GDPR requirements.
+- **Google AI (Gemini API)** — used to (1) generate a summary of tester feedback for developers, (2) automatically translate tester feedback into the developer's app language, and (3) translate chat messages when the sender or the recipient has the chat's "Automatic translation" option on (on by default). Only the text being summarized or translated is sent for these purposes (with the language to translate into) — no name, email, account information, or other identifier. A note about this processing is included in this policy in compliance with GDPR requirements.
 - **Google Play** — testers access your app via the Google Play Store closed testing track.
 - **Google Play Billing** — processes in-app purchases (Credits, visibility boosts and optional support tips). Google handles your payment details; we receive only a purchase confirmation.
 
 ## 4. Data Retention
 
 - **Chat messages and attachments** are automatically deleted 30 days after they are sent. Senders can also manually delete individual messages or attachments at any time within the app by long-pressing a message.
+- **Automatic translations** of chat messages are stored with the message and deleted with it, including when the sender deletes the message.
 - **Screenshots and generated proof images** (including those shared in chats) are automatically deleted within 30 days.
 - **Testing feedback** (written responses by other app users) is automatically deleted within 30 days. AI-generated summaries are retained for as long as your account is active.
 - **Single Tests:** listings and their test reports are automatically deleted 30 days after submission (see our Terms & Conditions). Resubmitting or boosting a listing restarts the 30 days.

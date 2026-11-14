@@ -1,3 +1,8 @@
+---
+lang: en
+---
+{% include legal_languages.html app="testcircle" %}
+
 # Terms & Conditions
 *Last updated: October 2026*
 
