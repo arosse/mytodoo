@@ -15,3 +15,15 @@ testcircle:
     name: English
   - code: fr
     name: Français
+  - code: de
+    name: Deutsch
+  - code: es
+    name: Español
+  - code: it
+    name: Italiano
+  - code: pl
+    name: Polski
+  - code: pt
+    name: Português
+  - code: tr
+    name: Türkçe
