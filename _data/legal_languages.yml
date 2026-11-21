@@ -27,3 +27,15 @@ testcircle:
     name: Português
   - code: tr
     name: Türkçe
+  - code: ar
+    name: العربية
+  - code: id
+    name: Bahasa Indonesia
+  - code: vi
+    name: Tiếng Việt
+  - code: ja
+    name: 日本語
+  - code: ko
+    name: 한국어
+  - code: zh
+    name: 简体中文
